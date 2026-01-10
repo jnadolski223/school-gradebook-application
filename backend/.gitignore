@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Compolation results
+dist/
+
+# Environment files
+.env
+
+# System and IDEs files
+.idea/
+.vscode/
