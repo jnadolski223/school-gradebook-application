@@ -1,0 +1,196 @@
+Enum day_of_week {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+Enum attendance_status {
+  PRESENT
+  ABSENT
+  EXCUSED
+  LATE
+  JUSTIFIED
+}
+
+Enum calendar_event_type {
+  DAY_OFF
+  CANCELLED_CLASS
+  SUBSTITUTION
+  TEST
+  QUIZ
+  OTHER
+}
+
+Enum school_application_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+Enum user_role {
+  STUDENT
+  PARENT
+  TEACHER
+  SCHOOL_ADMINISTRATOR
+  APP_ADMINISTRATOR
+}
+
+Enum grade_type {
+  REGULAR
+  PROPOSED_SEMESTER
+  SEMESTER
+  PROPOSED_FINAL
+  FINAL
+}
+
+Enum grade_value {
+  ONE_MINUS
+  ONE
+  ONE_PLUS
+  TWO_MINUS
+  TWO
+  TWO_PLUS
+  THREE_MINUS
+  THREE
+  THREE_PLUS
+  FOUR_MINUS
+  FOUR
+  FOUR_PLUS
+  FIVE_MINUS
+  FIVE
+  FIVE_PLUS
+  SIX_MINUS
+  SIX
+  SIX_PLUS
+  MINUS
+  PLUS
+  NO_HOMEWORK
+  NOT_PREPARED
+  NOT_CLASSIFIED
+}
+
+Table users {
+  id uuid [primary key]
+  login varchar [unique, not null]
+  password varchar [not null]
+  role user_role [not null]
+  created_at timestamp [not null]
+  modified_at timestamp [not null]
+  is_active bool [not null]
+}
+
+Table school_members {
+  user_id uuid [primary key, ref: > users.id]
+  school_id uuid [not null, ref: > schools.id]
+  first_name varchar [not null]
+  last_name varchar [not null]
+}
+
+Table schools {
+  id uuid [primary key]
+  name varchar [not null]
+  street varchar [not null]
+  postal_code varchar [not null]
+  city varchar [not null]
+  phone_number varchar
+  email varchar
+  rspo_number varchar [not null]
+  created_at timestamp [not null]
+  modified_at timestamp [not null]
+  is_active bool [not null]
+}
+
+Table subjects {
+  id uuid [primary key]
+  school_id uuid [not null, ref: > schools.id]
+  name varchar [not null]
+}
+
+Table school_classes {
+  id uuid [primary key]
+  school_id uuid [not null, ref: > schools.id]
+  homeroom_teacher_id uuid [not null, unique, ref: > school_members.user_id]
+  name varchar [not null]
+}
+
+Table students {
+  user_id uuid [primary key, ref: > school_members.user_id]
+  parent_id uuid [not null, ref: > school_members.user_id]
+  school_class_id uuid [not null, ref: > school_classes.id]
+}
+
+Table lessons {
+  id uuid [primary key]
+  teacher_id uuid [not null, ref: > school_members.user_id]
+  school_class_id uuid [not null, ref: > school_classes.id]
+  subject_id uuid [not null, ref: > subjects.id]
+  room varchar
+  start_time time [not null]
+  end_time time [not null]
+  day day_of_week [not null]
+  start_date date [not null]
+  end_date date [not null]
+}
+
+Table attendances {
+  id uuid [primary key]
+  lesson_id uuid [not null, ref: > lessons.id]
+  student_id uuid [not null, ref: > students.user_id]
+  status attendance_status [not null]
+  created_at timestamp [not null]
+  modified_at timestamp [not null]
+}
+
+Table grades {
+  id uuid [primary key]
+  student_id uuid [not null, ref: > students.user_id]
+  teacher_id uuid [not null, ref: > school_members.user_id]
+  subject_id uuid [not null, ref: > subjects.id]
+  grade_value grade_value [not null]
+  grade_type grade_type [not null]
+  weight int [not null]
+  count_to_average bool [not null]
+  created_at timestamp [not null]
+  modified_at timestamp [not null]
+  description text
+}
+
+Table messages {
+  id uuid [primary key]
+  sender_id uuid [not null, ref: > school_members.user_id]
+  recipient_id uuid [not null, ref: > school_members.user_id]
+  title varchar [not null]
+  content text [not null]
+  created_at timestamp [not null]
+}
+
+Table calendar_events {
+  id uuid [primary key]
+  sender_id uuid [not null, ref: > school_members.user_id]
+  recipient_class_id uuid [ref: > school_classes.id]
+  recipient_school_id uuid [not null, ref: > schools.id]
+  type calendar_event_type [not null]
+  description text
+  created_at timestamp [not null]
+  modified_at timestamp [not null]
+  event_date date [not null]
+}
+
+Table school_applications {
+  id uuid [primary key]
+  sender_first_name varchar [not null]
+  sender_last_name varchar [not null]
+  sender_email varchar [not null]
+  school_name varchar [not null]
+  school_street varchar [not null]
+  school_postal_code varchar [not null]
+  school_city varchar [not null]
+  rspo_number varchar [not null]
+  description text [not null]
+  created_at timestamp [not null]
+  status school_application_status [not null]
+}
