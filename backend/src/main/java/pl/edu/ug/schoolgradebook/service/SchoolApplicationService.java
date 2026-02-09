@@ -8,6 +8,7 @@ import pl.edu.ug.schoolgradebook.dto.SchoolApplicationRequest;
 import pl.edu.ug.schoolgradebook.dto.SchoolApplicationResponseFull;
 import pl.edu.ug.schoolgradebook.dto.SchoolApplicationResponseShort;
 import pl.edu.ug.schoolgradebook.enums.SchoolApplicationStatus;
+import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.repository.SchoolApplicationRepository;
 
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class SchoolApplicationService {
-    private final SchoolApplicationRepository schoolApplicationRepository;
+    private final SchoolApplicationRepository repository;
 
     public SchoolApplicationResponseFull createApplication(SchoolApplicationRequest requestDto) {
         SchoolApplication application = SchoolApplication.builder()
@@ -34,73 +35,76 @@ public class SchoolApplicationService {
                 .status(SchoolApplicationStatus.PENDING)
                 .build();
 
-        schoolApplicationRepository.save(application);
+        repository.save(application);
 
         return mapToFullDto(application);
     }
 
-    public List<SchoolApplicationResponseShort> getAllApplicationsShort() {
-        return schoolApplicationRepository
+    @Transactional(readOnly = true)
+    public List<SchoolApplicationResponseShort> getAllApplications() {
+        return repository
                 .findAll()
                 .stream()
                 .map(this::mapToShortDto)
                 .collect(Collectors.toList());
     }
 
-    public List<SchoolApplicationResponseShort> getApplicationsByStatusShort(SchoolApplicationStatus status) {
-        return schoolApplicationRepository
+    @Transactional(readOnly = true)
+    public List<SchoolApplicationResponseShort> getAllApplicationsByStatus(SchoolApplicationStatus status) {
+        return repository
                 .findByStatus(status)
                 .stream()
                 .map(this::mapToShortDto)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public SchoolApplicationResponseFull getApplicationById(UUID id) {
-        SchoolApplication application = schoolApplicationRepository
+        SchoolApplication application = repository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Wniosek o podanym ID nie istnieje"));
+                .orElseThrow(() -> new EntityNotFoundException(SchoolApplication.class, id.toString()));
         return mapToFullDto(application);
     }
 
     public SchoolApplicationResponseFull updateApplicationStatus(UUID id, SchoolApplicationStatus status) {
-        SchoolApplication application = schoolApplicationRepository
+        SchoolApplication application = repository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Wniosek o podanym ID nie istnieje"));
+                .orElseThrow(() -> new EntityNotFoundException(SchoolApplication.class, id.toString()));
         application.setStatus(status);
-        schoolApplicationRepository.save(application);
+        repository.save(application);
         return mapToFullDto(application);
     }
 
     public void deleteApplication(UUID id) {
-        if (!schoolApplicationRepository.existsById(id)) {
-            throw new IllegalArgumentException("Wniosek o podanym ID nie istnieje");
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException(SchoolApplication.class, id.toString());
         }
-        schoolApplicationRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private SchoolApplicationResponseShort mapToShortDto(SchoolApplication schoolApplication) {
+    private SchoolApplicationResponseShort mapToShortDto(SchoolApplication application) {
         return new SchoolApplicationResponseShort(
-                schoolApplication.getId(),
-                schoolApplication.getSchoolName(),
-                schoolApplication.getCreatedAt(),
-                schoolApplication.getStatus()
+                application.getId(),
+                application.getSchoolName(),
+                application.getCreatedAt(),
+                application.getStatus()
         );
     }
 
-    private SchoolApplicationResponseFull mapToFullDto(SchoolApplication schoolApplication) {
+    private SchoolApplicationResponseFull mapToFullDto(SchoolApplication application) {
         return new SchoolApplicationResponseFull(
-                schoolApplication.getId(),
-                schoolApplication.getSenderFirstName(),
-                schoolApplication.getSenderLastName(),
-                schoolApplication.getSenderEmail(),
-                schoolApplication.getSchoolName(),
-                schoolApplication.getSchoolStreet(),
-                schoolApplication.getSchoolPostalCode(),
-                schoolApplication.getSchoolCity(),
-                schoolApplication.getRspoNumber(),
-                schoolApplication.getDescription(),
-                schoolApplication.getCreatedAt(),
-                schoolApplication.getStatus()
+                application.getId(),
+                application.getSenderFirstName(),
+                application.getSenderLastName(),
+                application.getSenderEmail(),
+                application.getSchoolName(),
+                application.getSchoolStreet(),
+                application.getSchoolPostalCode(),
+                application.getSchoolCity(),
+                application.getRspoNumber(),
+                application.getDescription(),
+                application.getCreatedAt(),
+                application.getStatus()
         );
     }
 }
