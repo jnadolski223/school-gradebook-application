@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.edu.ug.schoolgradebook.enums.SchoolApplicationStatus;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -47,10 +47,19 @@ public class SchoolApplication {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SchoolApplicationStatus status;
+    @Builder.Default
+    private SchoolApplicationStatus status = SchoolApplicationStatus.PENDING;
+
+    @PrePersist
+    void onCreate() {
+        this.createdAt = Instant.now();
+        if (this.status == null) {
+            this.status = SchoolApplicationStatus.PENDING;
+        }
+    }
 }
