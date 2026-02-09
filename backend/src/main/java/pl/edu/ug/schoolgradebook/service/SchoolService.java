@@ -37,6 +37,7 @@ public class SchoolService {
         return mapToFullDto(school);
     }
 
+    @Transactional(readOnly = true)
     public List<SchoolResponseShort> getAll(Boolean active) {
         List<School> schools = active == null
                 ? repository.findAll()
@@ -45,6 +46,7 @@ public class SchoolService {
         return schools.stream().map(this::mapToShortDto).toList();
     }
 
+    @Transactional(readOnly = true)
     public SchoolResponseFull getById(UUID id) {
         return mapToFullDto(findSchool(id));
     }
