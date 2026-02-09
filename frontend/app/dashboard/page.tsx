@@ -1,7 +1,7 @@
 import React from "react";
 
-function Home() {
+function dashboard() {
   return <div>STRONA GŁÓWNA</div>;
 }
 
-export default Home;
+export default dashboard;
