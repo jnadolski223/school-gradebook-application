@@ -5,6 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.ug.schoolgradebook.api.ApiPaths;
 import pl.edu.ug.schoolgradebook.dto.*;
+import pl.edu.ug.schoolgradebook.dto.schoolapplication.SchoolApplicationRequest;
+import pl.edu.ug.schoolgradebook.dto.schoolapplication.SchoolApplicationResponseFull;
+import pl.edu.ug.schoolgradebook.dto.schoolapplication.SchoolApplicationResponseShort;
+import pl.edu.ug.schoolgradebook.dto.schoolapplication.UpdateSchoolApplicationStatusRequest;
 import pl.edu.ug.schoolgradebook.enums.SchoolApplicationStatus;
 import pl.edu.ug.schoolgradebook.service.SchoolApplicationService;
 

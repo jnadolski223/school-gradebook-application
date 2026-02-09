@@ -1,4 +1,4 @@
-package pl.edu.ug.schoolgradebook.dto;
+package pl.edu.ug.schoolgradebook.dto.schoolapplication;
 
 import pl.edu.ug.schoolgradebook.enums.SchoolApplicationStatus;
 
