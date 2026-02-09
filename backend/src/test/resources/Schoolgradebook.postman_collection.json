@@ -1,0 +1,425 @@
+{
+  "info": {
+    "_postman_id": "c06e615a-6058-4c25-ba14-b645bd27ab55",
+    "name": "School gradebook",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51525364",
+    "_collection_link": "https://go.postman.co/collection/51525364-c06e615a-6058-4c25-ba14-b645bd27ab55?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "SchoolApplication",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\t\"senderFirstName\": \"Jan\",\r\n\t\"senderLastName\": \"Kowalski\",\r\n\t\"senderEmail\": \"jan.kowalski@example.com\",\r\n\t\"schoolName\": \"Szkoła Podstawowa nr 1 w Warszawie\",\r\n\t\"schoolStreet\": \"Przykładowa 42\",\r\n\t\"schoolPostalCode\": \"00-000\",\r\n\t\"schoolCity\": \"Warszawa\",\r\n\t\"rspoNumber\": \"123456\",\r\n\t\"description\": \"Przykładowy opis\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Applications",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Approved Applications",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications?status=APPROVED",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "APPROVED"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Application By ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications/93354c38-b854-469e-aff2-f9ea96095e41",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications",
+                "93354c38-b854-469e-aff2-f9ea96095e41"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Application Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"APPROVED\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications/93354c38-b854-469e-aff2-f9ea96095e41",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications",
+                "93354c38-b854-469e-aff2-f9ea96095e41"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Application",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications/93354c38-b854-469e-aff2-f9ea96095e41",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications",
+                "93354c38-b854-469e-aff2-f9ea96095e41"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "School",
+      "item": [
+        {
+          "name": "Create school",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\t\"name\": \"Szkoła Podstawowa nr 1 w Warszawie\",\r\n\t\"street\": \"Przykładowa 42\",\r\n\t\"postalCode\": \"00-000\",\r\n\t\"city\": \"Warszawa\",\r\n\t\"phoneNumber\": \"+48123456789\",\r\n\t\"email\": \"sp.warszawa@example.com\",\r\n\t\"rspoNumber\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all schools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all active schools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools?active=true",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all inactive schools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools?active=false",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get school by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update school",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\t\"name\": \"Szkoła Podstawowa nr 1 w Gdańsku\",\r\n\t\"street\": \"Przykładowa 13\",\r\n\t\"postalCode\": \"00-000\",\r\n\t\"city\": \"Gdańsk\",\r\n\t\"phoneNumber\": \"+48123456789\",\r\n\t\"email\": \"sp.gdansk@example.com\",\r\n\t\"rspoNumber\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate school",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564/activate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+                "activate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate school",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+                "deactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete school",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

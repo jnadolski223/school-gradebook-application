@@ -5,4 +5,5 @@ public class ApiPaths {
 
     public static final String API_V1 = "/api/v1";
     public static final String SCHOOL_APPLICATIONS = API_V1 + "/school-applications";
+    public static final String SCHOOLS = API_V1 + "/schools";
 }
