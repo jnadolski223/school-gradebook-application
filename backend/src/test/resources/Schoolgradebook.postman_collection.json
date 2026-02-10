@@ -568,7 +568,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"login\": \"jkowalski123\",\r\n    \"password\": \"AlaMaKota%123&\",\r\n    \"role\": \"STUDENT\"\r\n}",
+              "raw": "{\r\n    \"login\": \"anowak456\",\r\n    \"password\": \"AlaMaKota%123&\",\r\n    \"role\": \"STUDENT\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -782,7 +782,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"userId\": \"e3aa941e-232b-494a-a3fa-fad400147d5b\",\r\n    \"schoolId\": \"900e2898-8f0d-4b16-b8c8-f9cf122350d6\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Kowalski\"\r\n}",
+              "raw": "{\r\n    \"userId\": \"5719952f-38e6-4420-864b-09e105b59828\",\r\n    \"schoolId\": \"a8d930c7-115f-40ab-8f63-a1eb1be4108c\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Kowalski\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -923,6 +923,164 @@
                 "v1",
                 "school-members",
                 "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SchoolClass",
+      "item": [
+        {
+          "name": "Create school class",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolId\": \"a8d930c7-115f-40ab-8f63-a1eb1be4108c\",\r\n    \"homeroomTeacherId\": \"0d62f67d-1835-45d1-9a4d-1dfbee2ccb27\",\r\n    \"name\": \"7C\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all school classes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all classes in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes?schoolId=a8d930c7-115f-40ab-8f63-a1eb1be4108c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "a8d930c7-115f-40ab-8f63-a1eb1be4108c"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get school class by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update school class",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"homeroomTeacherId\": \"0d62f67d-1835-45d1-9a4d-1dfbee2ccb27\",\r\n    \"name\": \"4C\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete school class",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
               ]
             }
           },

@@ -18,11 +18,11 @@ public class SchoolClass {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "school_id")
     private School school;
 
-    @OneToOne(optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "homeroom_teacher_id", unique = true)
     private SchoolMember homeroomTeacher;
 
