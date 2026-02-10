@@ -8,4 +8,5 @@ public class ApiPaths {
     public static final String SCHOOLS = API_V1 + "/schools";
     public static final String SUBJECTS = API_V1 + "/subjects";
     public static final String USERS = API_V1 + "/users";
+    public static final String SCHOOL_MEMBERS = API_V1 + "/school-members";
 }

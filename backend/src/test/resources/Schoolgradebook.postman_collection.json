@@ -771,6 +771,164 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "SchoolMember",
+      "item": [
+        {
+          "name": "Create member",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\": \"e3aa941e-232b-494a-a3fa-fad400147d5b\",\r\n    \"schoolId\": \"900e2898-8f0d-4b16-b8c8-f9cf122350d6\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Kowalski\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get members in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members?schoolId=a596e08e-9308-4ef7-a241-b83f6c6a2492",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "a596e08e-9308-4ef7-a241-b83f6c6a2492"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get member by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update member",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Anna\",\r\n    \"lastName\": \"Nowak\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
