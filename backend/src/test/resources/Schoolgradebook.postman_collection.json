@@ -1,0 +1,1092 @@
+{
+  "info": {
+    "_postman_id": "c06e615a-6058-4c25-ba14-b645bd27ab55",
+    "name": "Schoolgradebook",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51525364",
+    "_collection_link": "https://go.postman.co/collection/51525364-c06e615a-6058-4c25-ba14-b645bd27ab55?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "SchoolApplication",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\t\"senderFirstName\": \"Jan\",\r\n\t\"senderLastName\": \"Kowalski\",\r\n\t\"senderEmail\": \"jan.kowalski@example.com\",\r\n\t\"schoolName\": \"Szkoła Podstawowa nr 1 w Warszawie\",\r\n\t\"schoolStreet\": \"Przykładowa 42\",\r\n\t\"schoolPostalCode\": \"00-000\",\r\n\t\"schoolCity\": \"Warszawa\",\r\n\t\"rspoNumber\": \"123456\",\r\n\t\"description\": \"Przykładowy opis\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Applications",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Approved Applications",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications?status=APPROVED",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "APPROVED"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Application By ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications/93354c38-b854-469e-aff2-f9ea96095e41",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications",
+                "93354c38-b854-469e-aff2-f9ea96095e41"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Application Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"APPROVED\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications/93354c38-b854-469e-aff2-f9ea96095e41",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications",
+                "93354c38-b854-469e-aff2-f9ea96095e41"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Application",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"senderFirstName\": \"Zdzisław\",\r\n    \"senderLastName\": \"Pruchniewski\",\r\n    \"senderEmail\": \"z.pruchniewski@gmail.com\",\r\n    \"schoolName\": \"Szkoła Podstawowa im. Mariusza Zaruskiego w Pucku\",\r\n    \"schoolStreet\": \"Przebendowskiego 19\",\r\n    \"schoolPostalCode\": \"84-100\",\r\n    \"schoolCity\": \"Puck\",\r\n    \"rspoNumber\": \"42042042069\",\r\n    \"description\": \"XDDDDDDDDDDDD\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-applications/93354c38-b854-469e-aff2-f9ea96095e41",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-applications",
+                "93354c38-b854-469e-aff2-f9ea96095e41"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "School",
+      "item": [
+        {
+          "name": "Create school",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\t\"name\": \"Szkoła Podstawowa nr 1 w Warszawie\",\r\n\t\"street\": \"Przykładowa 42\",\r\n\t\"postalCode\": \"00-000\",\r\n\t\"city\": \"Warszawa\",\r\n\t\"phoneNumber\": \"+48123456789\",\r\n\t\"email\": \"sp.warszawa@example.com\",\r\n\t\"rspoNumber\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all schools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all active schools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools?active=true",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all inactive schools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools?active=false",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools"
+              ],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get school by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update school",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\t\"name\": \"Szkoła Podstawowa nr 1 w Gdańsku\",\r\n\t\"street\": \"Przykładowa 13\",\r\n\t\"postalCode\": \"00-000\",\r\n\t\"city\": \"Gdańsk\",\r\n\t\"phoneNumber\": \"+48123456789\",\r\n\t\"email\": \"sp.gdansk@example.com\",\r\n\t\"rspoNumber\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate school",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564/activate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+                "activate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate school",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+                "deactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete school",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/schools/e950fe37-2777-4583-b8ef-bd3a3ffbd564",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "schools",
+                "e950fe37-2777-4583-b8ef-bd3a3ffbd564"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subject",
+      "item": [
+        {
+          "name": "Create subject",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolId\": \"821c07cc-d4f7-4a69-afa1-6793c864f974\",\r\n    \"name\": \"Matematyka\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all subject in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects?schoolId=821c07cc-d4f7-4a69-afa1-6793c864f974",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "821c07cc-d4f7-4a69-afa1-6793c864f974"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get subject by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects/462ab918-a5a0-4c2f-8a20-41537952fc8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects",
+                "462ab918-a5a0-4c2f-8a20-41537952fc8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update subject",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Matematyka rozszerzona\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects/462ab918-a5a0-4c2f-8a20-41537952fc8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects",
+                "462ab918-a5a0-4c2f-8a20-41537952fc8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete subject",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects/462ab918-a5a0-4c2f-8a20-41537952fc8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects",
+                "462ab918-a5a0-4c2f-8a20-41537952fc8d"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"login\": \"anowak456\",\r\n    \"password\": \"AlaMaKota%123&\",\r\n    \"role\": \"STUDENT\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Log in",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"login\": \"jkowalski123\",\r\n    \"password\": \"AlaMaKota%123&\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get active users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users?active=true",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update user",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"login\": \"jkowalski\",\r\n    \"password\": \"uga_buga_67\",\r\n    \"role\": \"APP_ADMINISTRATOR\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate user",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded/activate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+                "activate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate user",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+                "deactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SchoolMember",
+      "item": [
+        {
+          "name": "Create member",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\": \"5719952f-38e6-4420-864b-09e105b59828\",\r\n    \"schoolId\": \"a8d930c7-115f-40ab-8f63-a1eb1be4108c\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Kowalski\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get members in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members?schoolId=a596e08e-9308-4ef7-a241-b83f6c6a2492",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "a596e08e-9308-4ef7-a241-b83f6c6a2492"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get member by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update member",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Anna\",\r\n    \"lastName\": \"Nowak\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SchoolClass",
+      "item": [
+        {
+          "name": "Create school class",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolId\": \"a8d930c7-115f-40ab-8f63-a1eb1be4108c\",\r\n    \"homeroomTeacherId\": \"0d62f67d-1835-45d1-9a4d-1dfbee2ccb27\",\r\n    \"name\": \"7C\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all school classes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all classes in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes?schoolId=a8d930c7-115f-40ab-8f63-a1eb1be4108c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "a8d930c7-115f-40ab-8f63-a1eb1be4108c"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get school class by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update school class",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"homeroomTeacherId\": \"0d62f67d-1835-45d1-9a4d-1dfbee2ccb27\",\r\n    \"name\": \"4C\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete school class",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

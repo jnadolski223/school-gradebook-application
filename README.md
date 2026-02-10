@@ -9,7 +9,7 @@ Celem projektu jest stworzenie dziennika elektronicznego dla szkół podstawowyc
 
 ## Technologie użyte w projekcie
 - Frontend: TypeScript, React, Next.js
-- Backend: Java, Spring
+- Backend: Java, Spring Boot
 - Baza danych: PostgreSQL
 - Konteneryzacja aplikacji: Docker
 
@@ -25,7 +25,11 @@ W aplikacji będzie dostępnie kilka ról użytkowników:
 Schemat dziedziczenia funkcjonalności przypisanych do ról przedstawiono na diagramie ([link](./diagrams/user-roles.png)).
 
 ## Wymagania funkcjonalne aplikacji
-Wymagania funkcjonalne zostały podzielone według ról użytkowników, które będą dostępne w systemie dziennika elektronicznego. Role **Użytkownik** i **Członek szkoły** są abstrakcyjnymi rolami, które nie są dostępne dla użytkowników aplikacji.
+Wymagania funkcjonalne zostały podzielone według ról użytkowników, które będą dostępne w systemie dziennika elektronicznego. Role **Użytkownik** i **Członek szkoły** są abstrakcyjnymi rolami, które nie są dostępne dla użytkowników aplikacji. Podział funkcjonalności został też przedstawiony na diagramie przypadków użycia ([link](./diagrams/use-case-diagram.png))
+
+### Niezalogowany użytkownik
+- Pisanie wniosków o rejestrację szkoły w systemie
+- Logowanie się na konto
 
 ### Użytkownik
 - Zarządzanie danymi konta
@@ -38,6 +42,7 @@ Wymagania funkcjonalne zostały podzielone według ról użytkowników, które b
 ### Administrator szkoły
 - Funkcjonalności dla roli ***Użytkownik*** 
 - Zarządzanie danymi szkoły
+- Zarządzanie członkami szkoły
 - Zarządzanie klasami w szkole
 - Zarządzanie planami zajęć klas i nauczycieli
 
@@ -49,7 +54,7 @@ Wymagania funkcjonalne zostały podzielone według ról użytkowników, które b
 - Pisanie wiadomości
 
 ### Uczeń
-- Funkcjonalności dla roli ***Członek szkoły***
+- Funkcjonalności dla roli ***Członek szkoły****
 - Przeglądanie ocen
 - Przeglądanie frekwencji
 - Przeglądanie uwag
@@ -74,3 +79,4 @@ Wymagania funkcjonalne zostały podzielone według ról użytkowników, które b
 ## Baza danych
 - Diagram ERD bazy danych ([link](./diagrams/erd-diagram.pdf))
 - Kod diagramu ERD bazy danych w języku DBML ([link](./diagrams/erd-diagram-source.dbml))
+
