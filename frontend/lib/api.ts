@@ -227,3 +227,80 @@ export async function deleteUser(id: string) {
     throw new Error("Failed to delete user");
   }
 }
+
+// --- School members API ---
+export interface SchoolMember {
+  userId: string;
+  schoolId: string;
+  firstName: string;
+  lastName: string;
+}
+
+// Tworzy nowego członka szkoły
+export async function createSchoolMember(data: SchoolMember) {
+  const response = await fetch(`${API_BASE_URL}/school-members`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (response.status !== 201) {
+    throw new Error("Failed to create school member");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolMember>;
+}
+
+// Pobiera wszystkich członków szkół lub filtruje po schoolId
+export async function getAllSchoolMembers(schoolId?: string) {
+  const url = new URL(`${API_BASE_URL}/school-members`);
+  if (schoolId) url.searchParams.append("schoolId", schoolId);
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch school members");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolMember[]>;
+}
+
+// Pobiera członka szkoły po ID
+export async function getSchoolMemberById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/school-members/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch school member");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolMember>;
+}
+
+// Aktualizuje członka szkoły
+export async function updateSchoolMember(
+  id: string,
+  data: Partial<SchoolMember>,
+) {
+  const response = await fetch(`${API_BASE_URL}/school-members/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update school member");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolMember>;
+}
+
+// Usuwa członka szkoły
+export async function deleteSchoolMember(id: string) {
+  const response = await fetch(`${API_BASE_URL}/school-members/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to delete school member");
+  }
+}
