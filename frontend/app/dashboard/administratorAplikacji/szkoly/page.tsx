@@ -25,7 +25,7 @@ type School = {
   isActive?: boolean;
 };
 
-const API_BASE = "/api/v1/schools";
+const API_BASE = "http://localhost:8080/api/v1/schools";
 
 async function apiGet<T>(url: string) {
   const res = await fetch(url);
