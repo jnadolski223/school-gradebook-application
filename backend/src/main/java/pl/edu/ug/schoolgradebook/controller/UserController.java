@@ -12,6 +12,7 @@ import pl.edu.ug.schoolgradebook.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping(ApiPaths.USERS)
 @RequiredArgsConstructor

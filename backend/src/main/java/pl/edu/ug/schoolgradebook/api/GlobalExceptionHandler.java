@@ -2,6 +2,7 @@ package pl.edu.ug.schoolgradebook.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -9,6 +10,7 @@ import pl.edu.ug.schoolgradebook.dto.ApiError;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
