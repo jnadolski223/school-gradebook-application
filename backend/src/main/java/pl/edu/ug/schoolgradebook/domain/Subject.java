@@ -18,8 +18,8 @@ public class Subject {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "school_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "school_id", nullable = false, updatable = false)
     private School school;
 
     @Column(nullable = false)

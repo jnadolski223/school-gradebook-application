@@ -420,6 +420,143 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Subject",
+      "item": [
+        {
+          "name": "Create subject",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolId\": \"821c07cc-d4f7-4a69-afa1-6793c864f974\",\r\n    \"name\": \"Matematyka\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all subject in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects?schoolId=821c07cc-d4f7-4a69-afa1-6793c864f974",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "821c07cc-d4f7-4a69-afa1-6793c864f974"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get subject by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects/462ab918-a5a0-4c2f-8a20-41537952fc8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects",
+                "462ab918-a5a0-4c2f-8a20-41537952fc8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update subject",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Matematyka rozszerzona\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects/462ab918-a5a0-4c2f-8a20-41537952fc8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects",
+                "462ab918-a5a0-4c2f-8a20-41537952fc8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete subject",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/subjects/462ab918-a5a0-4c2f-8a20-41537952fc8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "subjects",
+                "462ab918-a5a0-4c2f-8a20-41537952fc8d"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

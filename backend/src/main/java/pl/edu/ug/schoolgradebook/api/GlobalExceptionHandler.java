@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import pl.edu.ug.schoolgradebook.dto.ApiError;
+import pl.edu.ug.schoolgradebook.exception.ConflictException;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 
 @RestControllerAdvice
@@ -16,6 +17,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiError.of(HttpStatus.NOT_FOUND, exception.getMessage()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflict(ConflictException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiError.of(HttpStatus.CONFLICT, exception.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
