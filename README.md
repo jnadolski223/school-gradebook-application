@@ -9,7 +9,7 @@ Celem projektu jest stworzenie dziennika elektronicznego dla szkół podstawowyc
 
 ## Technologie użyte w projekcie
 - Frontend: TypeScript, React, Next.js
-- Backend: Java, Spring
+- Backend: Java, Spring Boot
 - Baza danych: PostgreSQL
 - Konteneryzacja aplikacji: Docker
 
@@ -22,7 +22,7 @@ W aplikacji będzie dostępnie kilka ról użytkowników:
 - Uczeń
 - Rodzic
 
-Schemat dziedziczenia funkcjonalności przypisanych do ról przedstawiono na diagramie ([link](./diagrams/user-roles.png)).
+Schemat dziedziczenia funkcjonalności przypisanych do ról przedstawiono na [[Role użytkowników.canvas|diagramie]].
 
 ## Wymagania funkcjonalne aplikacji
 Wymagania funkcjonalne zostały podzielone według ról użytkowników, które będą dostępne w systemie dziennika elektronicznego. Role **Użytkownik** i **Członek szkoły** są abstrakcyjnymi rolami, które nie są dostępne dla użytkowników aplikacji.
@@ -49,7 +49,7 @@ Wymagania funkcjonalne zostały podzielone według ról użytkowników, które b
 - Pisanie wiadomości
 
 ### Uczeń
-- Funkcjonalności dla roli ***Członek szkoły***
+- Funkcjonalności dla roli ***Członek szkoły****
 - Przeglądanie ocen
 - Przeglądanie frekwencji
 - Przeglądanie uwag
@@ -70,7 +70,3 @@ Wymagania funkcjonalne zostały podzielone według ról użytkowników, które b
 - Przeglądanie danych uczniów klasy
 - Przeglądanie planu zajęć klasy
 - Modyfikacja frekwencji uczniów klasy
-
-## Baza danych
-- Diagram ERD bazy danych ([link](./diagrams/erd-diagram.pdf))
-- Kod diagramu ERD bazy danych w języku DBML ([link](./diagrams/erd-diagram-source.dbml))
