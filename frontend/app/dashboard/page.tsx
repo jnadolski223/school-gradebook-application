@@ -12,26 +12,81 @@ import {
 
 export default function DashboardPage() {
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dashboard</h1>
+    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
+      <h1 style={{ fontSize: "2rem", color: "#3b82f6", marginBottom: "2rem" }}>
+        Dashboard
+      </h1>
 
-      <div style={{ margin: "16px 0", display: "flex", gap: 10 }}>
+      <div
+        style={{
+          margin: "0",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "1.5rem",
+        }}
+      >
         <Link href="/dashboard/administratorAplikacji">
-          <button style={{ padding: "8px 12px" }}>
-            Administrator Aplikacji
-          </button>
+          <div
+            style={{
+              padding: "2rem",
+              backgroundColor: "white",
+              borderRadius: "6px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+              cursor: "pointer",
+              textAlign: "center",
+            }}
+          >
+            <button
+              style={{
+                padding: "0.5rem 1rem",
+                fontSize: "1rem",
+                fontWeight: "600",
+                backgroundColor: "#3b82f6",
+                color: "white",
+                borderRadius: "6px",
+                border: "none",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Administrator Aplikacji
+            </button>
+          </div>
         </Link>
         <Link href="/dashboard/administratorSzkoly">
-          <button style={{ padding: "8px 12px" }}>Administrator Szkoły</button>
+          <div
+            style={{
+              padding: "2rem",
+              backgroundColor: "white",
+              borderRadius: "6px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+              cursor: "pointer",
+              textAlign: "center",
+            }}
+          >
+            <button
+              style={{
+                padding: "0.5rem 1rem",
+                fontSize: "1rem",
+                fontWeight: "600",
+                backgroundColor: "#3b82f6",
+                color: "white",
+                borderRadius: "6px",
+                border: "none",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Administrator Szkoły
+            </button>
+          </div>
         </Link>
       </div>
 
       <div
         style={{
           marginBottom: "20px",
-          display: "flex",
-          gap: "10px",
-          alignItems: "center",
+          display: "none",
         }}
       ></div>
     </div>

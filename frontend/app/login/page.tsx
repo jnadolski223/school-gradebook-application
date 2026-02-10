@@ -60,159 +60,344 @@ export default function LoginPage() {
   };
 
   return (
-    <div>
-      <h1>Logowanie i Rejestracja</h1>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1rem",
+        backgroundColor: "#f9fafb",
+      }}
+    >
+      <div style={{ width: "100%", maxWidth: "400px" }}>
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <h1
+            style={{
+              fontSize: "2rem",
+              color: "#3b82f6",
+              marginBottom: "0.5rem",
+            }}
+          >
+            Dziennik Szkolny
+          </h1>
+        </div>
 
-      {error && (
         <div
           style={{
-            color: "red",
-            margin: "10px 0",
-            border: "1px solid red",
-            padding: "10px",
+            backgroundColor: "white",
+            borderRadius: "6px",
+            padding: "2rem",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
           }}
         >
-          {error}
-        </div>
-      )}
-      {success && (
-        <div
-          style={{
-            color: "green",
-            margin: "10px 0",
-            border: "1px solid green",
-            padding: "10px",
-          }}
-        >
-          {success}
-        </div>
-      )}
-
-      <div style={{ marginBottom: "30px" }}>
-        <button
-          onClick={() => setIsLogin(!isLogin)}
-          style={{ marginBottom: "20px", padding: "10px" }}
-        >
-          {isLogin ? "Przejdź do rejestracji" : "Przejdź do logowania"}
-        </button>
-
-        {isLogin ? (
-          <div>
-            <h2>Logowanie</h2>
-            <form
-              onSubmit={handleLogin}
+          {error && (
+            <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-                maxWidth: "300px",
+                color: "#991b1b",
+                margin: "0 0 1rem 0",
+                border: "1px solid #dc2626",
+                padding: "0.75rem",
+                backgroundColor: "#fee2e2",
+                borderRadius: "4px",
+                borderLeft: "4px solid #dc2626",
               }}
             >
-              <div>
-                <label>Login:</label>
-                <input
-                  type="text"
-                  value={loginForm.login}
-                  onChange={(e) =>
-                    setLoginForm({ ...loginForm, login: e.target.value })
-                  }
-                  required
-                  style={{ width: "100%", padding: "5px" }}
-                />
-              </div>
-              <div>
-                <label>Hasło:</label>
-                <input
-                  type="password"
-                  value={loginForm.password}
-                  onChange={(e) =>
-                    setLoginForm({ ...loginForm, password: e.target.value })
-                  }
-                  required
-                  style={{ width: "100%", padding: "5px" }}
-                />
-              </div>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div
+              style={{
+                color: "#065f46",
+                margin: "0 0 1rem 0",
+                border: "1px solid #10b981",
+                padding: "0.75rem",
+                backgroundColor: "#d1fae5",
+                borderRadius: "4px",
+                borderLeft: "4px solid #10b981",
+              }}
+            >
+              {success}
+            </div>
+          )}
+
+          <div style={{ marginBottom: "0" }}>
+            <div
+              style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}
+            >
               <button
-                type="submit"
-                disabled={isLoading}
-                style={{ padding: "10px" }}
+                onClick={() => setIsLogin(true)}
+                style={{
+                  flex: 1,
+                  padding: "0.75rem 1rem",
+                  fontSize: "1rem",
+                  fontWeight: isLogin ? "600" : "500",
+                  backgroundColor: isLogin ? "#3b82f6" : "#e5e7eb",
+                  color: isLogin ? "white" : "#1f2937",
+                  border: "none",
+                  borderRadius: "6px 0 0 0",
+                  cursor: "pointer",
+                }}
               >
-                {isLoading ? "Logowanie..." : "Zaloguj się"}
+                Logowanie
               </button>
-            </form>
-          </div>
-        ) : (
-          <div>
-            <h2>Rejestracja</h2>
-            <form
-              onSubmit={handleRegister}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-                maxWidth: "300px",
-              }}
-            >
+              <button
+                onClick={() => setIsLogin(false)}
+                style={{
+                  flex: 1,
+                  padding: "0.75rem 1rem",
+                  fontSize: "1rem",
+                  fontWeight: !isLogin ? "600" : "500",
+                  backgroundColor: !isLogin ? "#3b82f6" : "#e5e7eb",
+                  color: !isLogin ? "white" : "#1f2937",
+                  border: "none",
+                  borderRadius: "0 6px 0 0",
+                  cursor: "pointer",
+                }}
+              >
+                Rejestracja
+              </button>
+            </div>
+
+            {isLogin ? (
               <div>
-                <label>Login:</label>
-                <input
-                  type="text"
-                  value={registerForm.login}
-                  onChange={(e) =>
-                    setRegisterForm({ ...registerForm, login: e.target.value })
-                  }
-                  required
-                  style={{ width: "100%", padding: "5px" }}
-                />
-              </div>
-              <div>
-                <label>Hasło:</label>
-                <input
-                  type="password"
-                  value={registerForm.password}
-                  onChange={(e) =>
-                    setRegisterForm({
-                      ...registerForm,
-                      password: e.target.value,
-                    })
-                  }
-                  required
-                  style={{ width: "100%", padding: "5px" }}
-                />
-              </div>
-              <div>
-                <label>Rola:</label>
-                <select
-                  value={registerForm.role}
-                  onChange={(e) =>
-                    setRegisterForm({
-                      ...registerForm,
-                      role: e.target.value as UserRole,
-                    })
-                  }
-                  style={{ width: "100%", padding: "5px" }}
+                <h2
+                  style={{
+                    fontSize: "1.5rem",
+                    marginBottom: "1.5rem",
+                    fontWeight: "600",
+                  }}
                 >
-                  <option value="STUDENT">Uczeń</option>
-                  <option value="PARENT">Rodzic</option>
-                  <option value="TEACHER">Nauczyciel</option>
-                  <option value="SCHOOL_ADMINISTRATOR">
-                    Administrator szkoły
-                  </option>
-                  <option value="APP_ADMINISTRATOR">
-                    Administrator aplikacji
-                  </option>
-                </select>
+                  Logowanie
+                </h2>
+                <form
+                  onSubmit={handleLogin}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1.5rem",
+                  }}
+                >
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Login
+                    </label>
+                    <input
+                      type="text"
+                      value={loginForm.login}
+                      onChange={(e) =>
+                        setLoginForm({ ...loginForm, login: e.target.value })
+                      }
+                      required
+                      placeholder="Wpisz login"
+                      style={{
+                        width: "100%",
+                        padding: "0.625rem 0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        fontSize: "0.95rem",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Hasło
+                    </label>
+                    <input
+                      type="password"
+                      value={loginForm.password}
+                      onChange={(e) =>
+                        setLoginForm({ ...loginForm, password: e.target.value })
+                      }
+                      required
+                      placeholder="Wpisz hasło"
+                      style={{
+                        width: "100%",
+                        padding: "0.625rem 0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        fontSize: "0.95rem",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    style={{
+                      padding: "0.75rem 1rem",
+                      backgroundColor: "#3b82f6",
+                      color: "white",
+                      fontWeight: "600",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {isLoading ? "Logowanie..." : "Zaloguj się"}
+                  </button>
+                </form>
               </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                style={{ padding: "10px" }}
-              >
-                {isLoading ? "Rejestracja..." : "Zarejestruj się"}
-              </button>
-            </form>
+            ) : (
+              <div>
+                <h2
+                  style={{
+                    fontSize: "1.5rem",
+                    marginBottom: "1.5rem",
+                    fontWeight: "600",
+                  }}
+                >
+                  Rejestracja
+                </h2>
+                <form
+                  onSubmit={handleRegister}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1.5rem",
+                  }}
+                >
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Login
+                    </label>
+                    <input
+                      type="text"
+                      value={registerForm.login}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          login: e.target.value,
+                        })
+                      }
+                      required
+                      placeholder="Wybierz login"
+                      style={{
+                        width: "100%",
+                        padding: "0.625rem 0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        fontSize: "0.95rem",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Hasło
+                    </label>
+                    <input
+                      type="password"
+                      value={registerForm.password}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          password: e.target.value,
+                        })
+                      }
+                      required
+                      placeholder="Wybierz hasło"
+                      style={{
+                        width: "100%",
+                        padding: "0.625rem 0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        fontSize: "0.95rem",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Rola
+                    </label>
+                    <select
+                      value={registerForm.role}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          role: e.target.value as UserRole,
+                        })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "0.625rem 0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        fontSize: "0.95rem",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      <option value="STUDENT">Uczeń</option>
+                      <option value="PARENT">Rodzic</option>
+                      <option value="TEACHER">Nauczyciel</option>
+                      <option value="SCHOOL_ADMINISTRATOR">
+                        Administrator szkoły
+                      </option>
+                      <option value="APP_ADMINISTRATOR">
+                        Administrator aplikacji
+                      </option>
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    style={{
+                      padding: "0.75rem 1rem",
+                      backgroundColor: "#3b82f6",
+                      color: "white",
+                      fontWeight: "600",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {isLoading ? "Rejestracja..." : "Zarejestruj się"}
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
