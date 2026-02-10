@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.edu.ug.schoolgradebook.enums.UserRole;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -30,12 +30,25 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime modifiedAt;
+    private Instant modifiedAt;
 
     @Column(nullable = false)
-    private boolean isActive;
+    @Builder.Default
+    private boolean isActive = true;
+
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        this.createdAt = now;
+        this.modifiedAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        this.modifiedAt = Instant.now();
+    }
 }
