@@ -120,6 +120,8 @@ export interface UserLoginResponse {
   id: string;
   login: string;
   role: UserRole;
+  schoolID: string | null;
+  isActive: boolean;
 }
 
 export interface UserUpdateRequest {
