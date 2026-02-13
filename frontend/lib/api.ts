@@ -549,6 +549,61 @@ export async function getSubjectsBySchoolId(schoolId: string) {
   return (await response.json()) as ApiResponse<Subject[]>;
 }
 
+// Subject request types
+export interface CreateSubjectRequest {
+  schoolId: string;
+  name: string;
+}
+
+export interface UpdateSubjectRequest {
+  name: string;
+}
+
+// Pobiera pojedynczy przedmiot po id
+export async function getSubjectById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/subjects/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch subject");
+  }
+
+  return (await response.json()) as ApiResponse<Subject>;
+}
+
+// Tworzy nowy przedmiot
+export async function createSubject(data: CreateSubjectRequest) {
+  const response = await fetch(`${API_BASE_URL}/subjects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create subject");
+  }
+
+  return (await response.json()) as ApiResponse<Subject>;
+}
+
+// Aktualizuje przedmiot
+export async function updateSubject(id: string, data: UpdateSubjectRequest) {
+  const response = await fetch(`${API_BASE_URL}/subjects/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update subject");
+  }
+
+  return (await response.json()) as ApiResponse<Subject>;
+}
+
 // Usuwa przedmiot
 export async function deleteSubject(id: string) {
   const response = await fetch(`${API_BASE_URL}/subjects/${id}`, {

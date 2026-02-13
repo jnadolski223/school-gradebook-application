@@ -40,7 +40,7 @@ export default function AdministratorSzkolyPrzedmiotyPage() {
   }
 
   const handleAddSubject = () => {
-    // Na razie nic nie robi
+    router.push("/dashboard/administratorSzkoly/przedmioty/dodaj");
   };
 
   const handleDeleteSubject = async (subjectId: string) => {
@@ -127,6 +127,11 @@ export default function AdministratorSzkolyPrzedmiotyPage() {
               {/* Right: Action Buttons */}
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/administratorSzkoly/przedmioty/${subject.id}`,
+                    )
+                  }
                   style={{
                     padding: "8px 16px",
                     backgroundColor: "#3b82f6",
