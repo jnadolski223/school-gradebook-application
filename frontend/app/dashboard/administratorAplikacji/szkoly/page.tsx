@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { deleteSchool } from "@/lib/api";
 
 type SchoolShort = {
   id: string;
@@ -102,6 +103,18 @@ export default function SchoolsAdminPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Czy na pewno chcesz usunąć tę szkołę?")) {
+      setError(null);
+      try {
+        await deleteSchool(id);
+        await fetchAll();
+      } catch (e: any) {
+        setError(e?.message || String(e));
+      }
+    }
   };
 
   return (
@@ -280,6 +293,7 @@ export default function SchoolsAdminPage() {
                 {/* Action buttons */}
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <button
+                    onClick={() => handleDelete(school.id)}
                     style={{
                       padding: "0.5rem 1rem",
                       backgroundColor: "#ef4444",
@@ -294,6 +308,9 @@ export default function SchoolsAdminPage() {
                     Usuń
                   </button>
                   <button
+                    onClick={() =>
+                      (window.location.href = `/dashboard/administratorAplikacji/szkoly/${school.id}`)
+                    }
                     style={{
                       padding: "0.5rem 1rem",
                       backgroundColor: "#3b82f6",
