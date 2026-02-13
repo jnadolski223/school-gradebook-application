@@ -3,10 +3,13 @@ package pl.edu.ug.schoolgradebook.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.ug.schoolgradebook.domain.SchoolMember;
 import pl.edu.ug.schoolgradebook.domain.User;
 import pl.edu.ug.schoolgradebook.dto.user.*;
+import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
+import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
 import pl.edu.ug.schoolgradebook.repository.UserRepository;
 
 import java.util.List;
@@ -17,10 +20,11 @@ import java.util.UUID;
 @Transactional
 public class UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+    private final SchoolMemberRepository schoolMemberRepository;
 
     public UserResponse register(UserRegisterRequest request) {
-        if (repository.existsByLogin(request.login())) {
+        if (userRepository.existsByLogin(request.login())) {
             throw new ConflictException("Login is taken by another user");
         }
 
@@ -31,12 +35,12 @@ public class UserService {
                 .isActive(true)
                 .build();
 
-        repository.save(user);
+        userRepository.save(user);
         return mapToDto(user);
     }
 
     public UserLoginResponse login(UserLoginRequest request) {
-        User user = repository
+        User user = userRepository
                 .findByLogin(request.login())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid login or password"));
 
@@ -48,29 +52,46 @@ public class UserService {
             throw new IllegalArgumentException("Invalid login or password");
         }
 
+        if (user.getRole() != UserRole.APP_ADMINISTRATOR) {
+            SchoolMember schoolMember = schoolMemberRepository
+                    .findById(user.getId())
+                    .orElseThrow(() -> new EntityNotFoundException(SchoolMember.class, user.getId().toString()));
+
+            return new UserLoginResponse(
+                    user.getId(),
+                    user.getLogin(),
+                    user.getRole(),
+                    schoolMember.getSchool().getId(),
+                    user.isActive()
+            );
+        }
+
+
         return new UserLoginResponse(
                 user.getId(),
                 user.getLogin(),
-                user.getRole()
+                user.getRole(),
+                null,
+                user.isActive()
         );
     }
 
     @Transactional(readOnly = true)
     public List<UserResponse> getUsers(Boolean active) {
         List<User> users = active == null
-                ? repository.findAll()
-                : repository.findByIsActive(active);
+                ? userRepository.findAll()
+                : userRepository.findByIsActive(active);
 
         return users.stream().map(this::mapToDto).toList();
     }
 
     public UserResponse updateUser(UUID id, UserUpdateRequest request) {
-        User user = repository
+        User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, id.toString()));
 
         if (request.login() != null && !request.login().equals(user.getLogin())) {
-            if (repository.existsByLogin(request.login())) {
+            if (userRepository.existsByLogin(request.login())) {
                 throw new ConflictException("Login is taken by another user");
             }
             user.setLogin(request.login());
@@ -84,7 +105,7 @@ public class UserService {
             user.setRole(request.role());
         }
 
-        repository.save(user);
+        userRepository.save(user);
         return mapToDto(user);
     }
 
@@ -97,14 +118,14 @@ public class UserService {
     }
 
     public void delete(UUID id) {
-        if (!repository.existsById(id)) {
+        if (!userRepository.existsById(id)) {
             throw new EntityNotFoundException(User.class, id.toString());
         }
-        repository.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     private void setActive(UUID id, boolean active) {
-        User user = repository
+        User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, id.toString()));
         user.setActive(active);
