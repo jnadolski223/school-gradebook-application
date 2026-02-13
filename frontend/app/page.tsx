@@ -49,22 +49,6 @@ function Home() {
             Zaloguj
           </button>
         </Link>
-        <Link href="/dashboard">
-          <button
-            style={{
-              padding: "0.75rem 2rem",
-              fontSize: "1rem",
-              fontWeight: "600",
-              backgroundColor: "#3b82f6",
-              color: "white",
-              borderRadius: "6px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Dashboard
-          </button>
-        </Link>
         <Link href="/wniosek">
           <button
             style={{

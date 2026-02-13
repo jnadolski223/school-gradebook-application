@@ -527,3 +527,35 @@ export async function deleteSchoolClass(id: string) {
     throw new Error("Failed to delete school class");
   }
 }
+
+// --- Subjects API ---
+export interface Subject {
+  id: string;
+  schoolId: string;
+  name: string;
+}
+
+// Pobiera przedmioty dla danej szkoły
+export async function getSubjectsBySchoolId(schoolId: string) {
+  const url = new URL(`${API_BASE_URL}/subjects`);
+  url.searchParams.append("schoolId", schoolId);
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch subjects");
+  }
+
+  return (await response.json()) as ApiResponse<Subject[]>;
+}
+
+// Usuwa przedmiot
+export async function deleteSubject(id: string) {
+  const response = await fetch(`${API_BASE_URL}/subjects/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to delete subject");
+  }
+}
