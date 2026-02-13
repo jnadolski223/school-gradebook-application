@@ -9,6 +9,8 @@ import pl.edu.ug.schoolgradebook.domain.User;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberCreateRequest;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberResponse;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberUpdateRequest;
+import pl.edu.ug.schoolgradebook.dto.user.UserRegisterRequest;
+import pl.edu.ug.schoolgradebook.dto.user.UserResponse;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
@@ -26,15 +28,24 @@ public class SchoolMemberService {
     private final SchoolMemberRepository schoolMemberRepository;
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
+    private final UserService userService;
 
     public SchoolMemberResponse create(SchoolMemberCreateRequest request) {
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest(
+                request.login(),
+                request.password(),
+                request.role()
+        );
+        UserResponse createdUser = userService.register(userRegisterRequest);
+
         User user = userRepository
-                .findById(request.userId())
-                .orElseThrow(() -> new EntityNotFoundException(User.class, request.userId().toString()));
+                .findById(createdUser.id())
+                .orElseThrow(() -> new EntityNotFoundException(User.class, createdUser.id().toString()));
+
 
         School school = schoolRepository
                 .findById(request.schoolId())
-                .orElseThrow(() -> new EntityNotFoundException(School.class, request.userId().toString()));
+                .orElseThrow(() -> new EntityNotFoundException(School.class, request.schoolId().toString()));
 
         if (schoolMemberRepository.existsById(user.getId())) {
             throw new ConflictException("User is already a school member");
@@ -97,8 +108,10 @@ public class SchoolMemberService {
         return new SchoolMemberResponse(
                 member.getUser().getId(),
                 member.getSchool().getId(),
+                member.getUser().getLogin(),
                 member.getFirstName(),
-                member.getLastName()
+                member.getLastName(),
+                member.getUser().getRole()
         );
     }
 }
