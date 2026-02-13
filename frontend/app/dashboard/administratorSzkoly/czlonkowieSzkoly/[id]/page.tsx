@@ -12,6 +12,11 @@ import {
   updateUser,
 } from "@/lib/api";
 
+type AllowedRole = "STUDENT" | "PARENT" | "TEACHER";
+const allowedRoles: AllowedRole[] = ["STUDENT", "PARENT", "TEACHER"];
+const isAllowedRole = (role: string): role is AllowedRole =>
+  allowedRoles.includes(role as AllowedRole);
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }
@@ -34,6 +39,7 @@ export default function MemberDetailsPage({
   const [editedLastName, setEditedLastName] = useState("");
   const [editedLogin, setEditedLogin] = useState("");
   const [editedPassword, setEditedPassword] = useState("");
+  const [editedRole, setEditedRole] = useState<AllowedRole>("STUDENT");
 
   useEffect(() => {
     fetchData();
@@ -52,6 +58,9 @@ export default function MemberDetailsPage({
       setEditedFirstName(memberRes.data.firstName);
       setEditedLastName(memberRes.data.lastName);
       setEditedLogin(userRes.data.login);
+      setEditedRole(
+        isAllowedRole(userRes.data.role) ? userRes.data.role : "STUDENT",
+      );
     } catch (e: any) {
       setError(e?.message ?? "Failed to load member data");
     } finally {
@@ -81,12 +90,19 @@ export default function MemberDetailsPage({
       }
 
       // Update user data
-      const userUpdateData: { login?: string; password?: string } = {};
+      const userUpdateData: {
+        login?: string;
+        password?: string;
+        role?: AllowedRole;
+      } = {};
       if (editedLogin && editedLogin !== user.login) {
         userUpdateData.login = editedLogin;
       }
       if (editedPassword && editedPassword.trim() !== "") {
         userUpdateData.password = editedPassword;
+      }
+      if (editedRole && editedRole !== user.role) {
+        userUpdateData.role = editedRole;
       }
 
       if (Object.keys(userUpdateData).length > 0) {
@@ -448,6 +464,39 @@ export default function MemberDetailsPage({
                   fontFamily: "inherit",
                 }}
               />
+            </div>
+
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  color: "#374151",
+                  fontWeight: "500",
+                }}
+              >
+                Rola
+              </label>
+              <select
+                value={editedRole}
+                onChange={(e) => setEditedRole(e.target.value as AllowedRole)}
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "0.625rem 0.75rem",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  fontSize: "0.95rem",
+                  fontFamily: "inherit",
+                  backgroundColor: "white",
+                }}
+              >
+                {allowedRoles.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div style={{ display: "flex", gap: "0.75rem" }}>
