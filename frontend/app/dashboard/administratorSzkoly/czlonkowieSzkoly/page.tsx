@@ -1,32 +1,54 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import {
   SchoolMember,
-  createSchoolMember,
   getAllSchoolMembers,
-  updateSchoolMember,
   deleteSchoolMember,
-} from "../../../../lib/api";
+  getUserById,
+  User,
+} from "@/lib/api";
+
+interface MemberWithRole extends SchoolMember {
+  role?: string;
+}
 
 export default function SchoolMembersPage() {
-  const [members, setMembers] = useState<SchoolMember[]>([]);
+  const router = useRouter();
+  const { user: userFromStorage, isLoading: authLoading } = useProtectedRoute();
+  const [members, setMembers] = useState<MemberWithRole[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [form, setForm] = useState<Partial<SchoolMember>>({});
-  const [editingId, setEditingId] = useState<string | null>(null);
-
   useEffect(() => {
+    if (!userFromStorage?.schoolID) return;
     fetchMembers();
-  }, []);
+  }, [userFromStorage?.schoolID]);
 
   async function fetchMembers() {
+    if (!userFromStorage?.schoolID) return;
+
     setLoading(true);
     setError(null);
     try {
-      const res = await getAllSchoolMembers();
-      setMembers(res.data ?? []);
+      const res = await getAllSchoolMembers(userFromStorage.schoolID);
+      const membersData = res.data ?? [];
+
+      // Fetch user data for each member to get their role
+      const membersWithRole = await Promise.all(
+        membersData.map(async (member) => {
+          try {
+            const userRes = await getUserById(member.userId);
+            return { ...member, role: userRes.data.role };
+          } catch {
+            return member;
+          }
+        }),
+      );
+
+      setMembers(membersWithRole);
     } catch (e: any) {
       setError(e?.message ?? "Failed to load members");
     } finally {
@@ -34,145 +56,168 @@ export default function SchoolMembersPage() {
     }
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleDelete(userId: string) {
+    if (!confirm("Czy na pewno chcesz usunąć tego członka szkoły?")) return;
     setError(null);
     try {
-      if (editingId) {
-        const res = await updateSchoolMember(editingId, {
-          firstName: form.firstName,
-          lastName: form.lastName,
-        } as Partial<SchoolMember>);
-        setMembers((m) =>
-          m.map((it) => (it.userId === editingId ? res.data : it)),
-        );
-        setEditingId(null);
-      } else {
-        // create expects full SchoolMember object
-        const payload: SchoolMember = {
-          userId: form.userId || "",
-          schoolId: form.schoolId || "",
-          firstName: form.firstName || "",
-          lastName: form.lastName || "",
-        };
-        const res = await createSchoolMember(payload);
-        setMembers((m) => [res.data, ...m]);
-      }
-      setForm({});
-    } catch (e: any) {
-      setError(e?.message ?? "Operation failed");
-    }
-  }
-
-  function startEdit(member: SchoolMember) {
-    setEditingId(member.userId);
-    setForm(member);
-  }
-
-  async function handleDelete(id: string) {
-    if (!confirm("Usunąć tego członka szkoły?")) return;
-    try {
-      await deleteSchoolMember(id);
-      setMembers((m) => m.filter((it) => it.userId !== id));
+      await deleteSchoolMember(userId);
+      setMembers((m) => m.filter((it) => it.userId !== userId));
     } catch (e: any) {
       setError(e?.message ?? "Failed to delete");
     }
   }
 
+  if (authLoading) {
+    return <div style={{ padding: "2rem" }}>Ładowanie...</div>;
+  }
+
   return (
-    <div>
-      <h1>Członkowie szkoły</h1>
+    <div style={{ padding: "2rem" }}>
+      <div
+        style={{
+          marginBottom: "2rem",
+        }}
+      >
+        <button
+          onClick={() =>
+            router.push("/dashboard/administratorSzkoly/czlonkowieSzkoly/dodaj")
+          }
+          style={{
+            padding: "0.75rem 1.5rem",
+            backgroundColor: "#10b981",
+            color: "white",
+            fontWeight: "600",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "0.95rem",
+          }}
+        >
+          Dodaj nowego członka
+        </button>
+      </div>
 
       {error && (
-        <div role="alert" style={{ color: "red" }}>
+        <div
+          style={{
+            color: "#991b1b",
+            margin: "0 0 1rem 0",
+            border: "1px solid #dc2626",
+            padding: "0.75rem",
+            backgroundColor: "#fee2e2",
+            borderRadius: "4px",
+            borderLeft: "4px solid #dc2626",
+          }}
+        >
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>userId: </label>
-          <input
-            name="userId"
-            value={form.userId ?? ""}
-            onChange={handleChange}
-          />
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+          Ładowanie...
         </div>
-        <div>
-          <label>schoolId: </label>
-          <input
-            name="schoolId"
-            value={form.schoolId ?? ""}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>firstName: </label>
-          <input
-            name="firstName"
-            value={form.firstName ?? ""}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>lastName: </label>
-          <input
-            name="lastName"
-            value={form.lastName ?? ""}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <button type="submit">{editingId ? "Zapisz" : "Utwórz"}</button>
-          {editingId && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingId(null);
-                setForm({});
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {members.map((member) => (
+            <div
+              key={member.userId}
+              style={{
+                backgroundColor: "white",
+                borderRadius: "6px",
+                padding: "1.5rem",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              Anuluj
-            </button>
+              {/* Left - Name */}
+              <div style={{ flex: 1 }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "1.1rem",
+                    fontWeight: "600",
+                    color: "#1f2937",
+                  }}
+                >
+                  {member.firstName} {member.lastName}
+                </h3>
+              </div>
+
+              {/* Middle - Role */}
+              <div
+                style={{
+                  flex: 1,
+                  textAlign: "center",
+                  color: "#6b7280",
+                  fontWeight: "500",
+                }}
+              >
+                {member.role || "Brak roli"}
+              </div>
+
+              {/* Right - Buttons */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  marginLeft: "1rem",
+                }}
+              >
+                <button
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/administratorSzkoly/czlonkowieSzkoly/${member.userId}`,
+                    )
+                  }
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor: "#3b82f6",
+                    color: "white",
+                    fontWeight: "600",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  Wyświetl
+                </button>
+                <button
+                  onClick={() => handleDelete(member.userId)}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                    fontWeight: "600",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  Usuń
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {members.length === 0 && !loading && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "3rem",
+                color: "#6b7280",
+                backgroundColor: "white",
+                borderRadius: "6px",
+              }}
+            >
+              Brak członków do wyświetlenia
+            </div>
           )}
         </div>
-      </form>
-
-      <hr />
-
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>userId</th>
-              <th>schoolId</th>
-              <th>firstName</th>
-              <th>lastName</th>
-              <th>actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((m) => (
-              <tr key={m.userId}>
-                <td>{m.userId}</td>
-                <td>{m.schoolId}</td>
-                <td>{m.firstName}</td>
-                <td>{m.lastName}</td>
-                <td>
-                  <button onClick={() => startEdit(m)}>Edit</button>
-                  <button onClick={() => handleDelete(m.userId)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       )}
     </div>
   );
