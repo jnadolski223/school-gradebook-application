@@ -19,7 +19,10 @@ export default function Profil() {
   // Fetch user data from API when user ID is available
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!userFromStorage?.id) return;
+      if (!userFromStorage?.id) {
+        setIsLoadingUser(false);
+        return;
+      }
 
       setIsLoadingUser(true);
       setError(null);
@@ -40,7 +43,7 @@ export default function Profil() {
     };
 
     fetchUserData();
-  }, [userFromStorage]);
+  }, [userFromStorage?.id]);
 
   if (authLoading || isLoadingUser) {
     return <div style={{ padding: "2rem" }}>Ładowanie...</div>;
