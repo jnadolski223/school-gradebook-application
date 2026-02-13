@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 
 type SchoolApplication = {
   senderFirstName: string;
@@ -61,7 +62,8 @@ export default function ApplicationPage() {
     description: "",
   });
 
-  const handleCreate = async () => {
+  const handleCreate = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setError(null);
     setSuccess(null);
     setCreated(null);
@@ -104,120 +106,384 @@ export default function ApplicationPage() {
   };
 
   return (
-    <div>
-      <h1>Utwórz nowy wniosek</h1>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1rem",
+        backgroundColor: "#f9fafb",
+      }}
+    >
+      <div style={{ width: "100%", maxWidth: "680px" }}>
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "6px",
+            padding: "2rem",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          }}
+        >
+          {error && (
+            <div
+              style={{
+                color: "#991b1b",
+                margin: "0 0 1rem 0",
+                border: "1px solid #dc2626",
+                padding: "0.75rem",
+                backgroundColor: "#fee2e2",
+                borderRadius: "4px",
+                borderLeft: "4px solid #dc2626",
+              }}
+            >
+              {error}
+            </div>
+          )}
+          {success && (
+            <div
+              style={{
+                color: "#065f46",
+                margin: "0 0 1rem 0",
+                border: "1px solid #10b981",
+                padding: "0.75rem",
+                backgroundColor: "#d1fae5",
+                borderRadius: "4px",
+                borderLeft: "4px solid #10b981",
+              }}
+            >
+              {success}
+            </div>
+          )}
 
-      {error && <div style={{ color: "red" }}>Błąd: {error}</div>}
-      {success && <div style={{ color: "green" }}>{success}</div>}
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              marginBottom: "1.5rem",
+              fontWeight: "600",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            Wypełnij wniosek o rejestrację szkoły
+          </h2>
 
-      <section>
-        <h2>Formularz wniosku</h2>
-        <div>
-          <input
-            placeholder="Imię"
-            value={createForm.senderFirstName}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                senderFirstName: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Nazwisko"
-            value={createForm.senderLastName}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                senderLastName: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Email"
-            value={createForm.senderEmail}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                senderEmail: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Nazwa szkoły"
-            value={createForm.schoolName}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                schoolName: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Ulica"
-            value={createForm.schoolStreet}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                schoolStreet: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Kod pocztowy"
-            value={createForm.schoolPostalCode}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                schoolPostalCode: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Miasto"
-            value={createForm.schoolCity}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                schoolCity: e.target.value,
-              })
-            }
-          />
-          <input
-            placeholder="Numer RSPO"
-            value={createForm.rspoNumber}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                rspoNumber: e.target.value,
-              })
-            }
-          />
-          <textarea
-            placeholder="Opis"
-            value={createForm.description}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                description: e.target.value,
-              })
-            }
-          />
+          <form
+            onSubmit={handleCreate}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.5rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+              }}
+            >
+              <span style={{ fontWeight: "600", color: "#374151" }}>
+                Dane wnioskodawcy
+              </span>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.75rem",
+                  flexWrap: "nowrap",
+                }}
+              >
+                <input
+                  placeholder="Imię"
+                  value={createForm.senderFirstName}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      senderFirstName: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <input
+                  placeholder="Nazwisko"
+                  value={createForm.senderLastName}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      senderLastName: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <input
+                  placeholder="Email"
+                  value={createForm.senderEmail}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      senderEmail: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+              }}
+            >
+              <span style={{ fontWeight: "600", color: "#374151" }}>
+                Dane szkoły
+              </span>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.75rem",
+                  flexWrap: "nowrap",
+                }}
+              >
+                <input
+                  placeholder="Nazwa szkoły"
+                  value={createForm.schoolName}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      schoolName: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <input
+                  placeholder="Numer RSPO"
+                  value={createForm.rspoNumber}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      rspoNumber: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+              }}
+            >
+              <span style={{ fontWeight: "600", color: "#374151" }}>
+                Adres szkoły
+              </span>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.75rem",
+                  flexWrap: "nowrap",
+                }}
+              >
+                <input
+                  placeholder="Miasto"
+                  value={createForm.schoolCity}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      schoolCity: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <input
+                  placeholder="Kod pocztowy"
+                  value={createForm.schoolPostalCode}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      schoolPostalCode: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <input
+                  placeholder="Ulica"
+                  value={createForm.schoolStreet}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      schoolStreet: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    flex: 1,
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+            </div>
+
+            <textarea
+              placeholder="Opis"
+              value={createForm.description}
+              onChange={(e) =>
+                setCreateForm({
+                  ...createForm,
+                  description: e.target.value,
+                })
+              }
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "0.625rem 0.75rem",
+                border: "1px solid #d1d5db",
+                borderRadius: "10px",
+                fontSize: "0.95rem",
+                fontFamily: "inherit",
+                minHeight: "140px",
+                resize: "none",
+              }}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                justifyContent: "space-between",
+              }}
+            >
+              <Link
+                href="/login"
+                style={{
+                  padding: "0.75rem 1rem",
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  fontWeight: "600",
+                  borderRadius: "20px",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontFamily: "inherit",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "50%",
+                }}
+              >
+                Wróć do logowania
+              </Link>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: "0.75rem 1rem",
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  fontWeight: "600",
+                  border: "none",
+                  borderRadius: "20px",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontFamily: "inherit",
+                  width: "50%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {loading ? "Tworzę..." : "Zatwierdź"}
+              </button>
+            </div>
+          </form>
+
+          {created && (
+            <div
+              style={{
+                marginTop: "1.5rem",
+                borderTop: "1px solid #e5e7eb",
+                paddingTop: "1.5rem",
+              }}
+            >
+              <h3 style={{ marginBottom: "0.75rem" }}>Utworzony wniosek</h3>
+              <pre style={{ margin: 0 }}>
+                {JSON.stringify(created, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
-        <button onClick={handleCreate} disabled={loading}>
-          {loading ? "Tworzę..." : "Utwórz wniosek"}
-        </button>
-      </section>
-
-      {created && (
-        <>
-          <hr />
-          <section>
-            <h2>Utworzony wniosek:</h2>
-            <pre>{JSON.stringify(created, null, 2)}</pre>
-          </section>
-        </>
-      )}
+      </div>
     </div>
   );
 }
