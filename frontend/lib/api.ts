@@ -126,13 +126,14 @@ export async function deleteSchool(id: string) {
 }
 
 // Aktywuje/deaktywuje szkołę
-export async function toggleSchoolActivation(id: string) {
-  const response = await fetch(`${API_BASE_URL}/schools/${id}/activate`, {
+export async function toggleSchoolActivation(id: string, activate: boolean) {
+  const endpoint = activate ? "activate" : "deactivate";
+  const response = await fetch(`${API_BASE_URL}/schools/${id}/${endpoint}`, {
     method: "PATCH",
   });
 
   if (response.status !== 204) {
-    throw new Error("Failed to toggle school activation");
+    throw new Error(`Failed to ${activate ? "activate" : "deactivate"} school`);
   }
 }
 
