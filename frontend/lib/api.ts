@@ -178,6 +178,7 @@ export async function createSchool(data: CreateSchoolRequest) {
 // User types
 export type UserRole =
   | "STUDENT"
+  | "HOMEROOM_TEACHER"
   | "PARENT"
   | "TEACHER"
   | "SCHOOL_ADMINISTRATOR"
@@ -360,10 +361,11 @@ export async function createSchoolMember(data: SchoolMemberCreateRequest) {
   return (await response.json()) as ApiResponse<SchoolMember>;
 }
 
-// Pobiera wszystkich członków szkół lub filtruje po schoolId
-export async function getAllSchoolMembers(schoolId?: string) {
+// Pobiera wszystkich członków szkół lub filtruje po schoolId i roli
+export async function getAllSchoolMembers(schoolId?: string, role?: string) {
   const url = new URL(`${API_BASE_URL}/school-members`);
   if (schoolId) url.searchParams.append("schoolId", schoolId);
+  if (role) url.searchParams.append("role", role);
 
   const response = await fetch(url.toString());
 
@@ -444,6 +446,27 @@ export interface SchoolClass {
   schoolId: string;
   homeroomTeacherId: string;
   name: string;
+}
+
+export interface CreateSchoolClassRequest {
+  schoolId: string;
+  homeroomTeacherId: string;
+  name: string;
+}
+
+// Tworzy nową klasę szkolną
+export async function createSchoolClass(data: CreateSchoolClassRequest) {
+  const response = await fetch(`${API_BASE_URL}/school-classes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (response.status !== 201) {
+    throw new Error("Failed to create school class");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolClass>;
 }
 
 // Pobiera klasy szkolne dla danej szkoły

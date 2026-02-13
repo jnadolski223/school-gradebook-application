@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   getSchoolClassesBySchoolId,
   deleteSchoolClass,
-  getUserById,
+  getAllSchoolMembers,
   SchoolClass,
 } from "@/lib/api";
 import { getUserFromStorage } from "@/lib/auth";
@@ -42,24 +42,22 @@ export default function AdministratorSzkolyKlasyPage() {
       const result = await getSchoolClassesBySchoolId(targetSchoolId);
       const classesData = result.data;
 
+      // Fetch all school members to get teacher names
+      const membersResult = await getAllSchoolMembers(targetSchoolId);
+      const allMembers = membersResult.data ?? [];
+
       // Fetch teacher names for each class
-      const classesWithTeachers = await Promise.all(
-        classesData.map(async (cls) => {
-          try {
-            const teacherData = await getUserById(cls.homeroomTeacherId);
-            const user = teacherData.data;
-            return {
-              ...cls,
-              teacherName: `${user.login}`,
-            };
-          } catch {
-            return {
-              ...cls,
-              teacherName: "Unknown",
-            };
-          }
-        }),
-      );
+      const classesWithTeachers = classesData.map((cls) => {
+        const teacher = allMembers.find(
+          (m) => m.userId === cls.homeroomTeacherId,
+        );
+        return {
+          ...cls,
+          teacherName: teacher
+            ? `${teacher.firstName} ${teacher.lastName}`
+            : "Unknown",
+        };
+      });
 
       setClasses(classesWithTeachers);
     } catch (err) {
