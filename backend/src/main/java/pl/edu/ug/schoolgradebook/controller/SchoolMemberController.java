@@ -8,6 +8,7 @@ import pl.edu.ug.schoolgradebook.dto.ApiResponse;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberCreateRequest;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberResponse;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberUpdateRequest;
+import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.service.SchoolMemberService;
 
 import java.net.URI;
@@ -33,12 +34,17 @@ public class SchoolMemberController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SchoolMemberResponse>>> getAll(@RequestParam(required = false) UUID schoolId) {
+    public ResponseEntity<ApiResponse<List<SchoolMemberResponse>>> getAll(@RequestParam(required = false) UUID schoolId, @RequestParam(required = false) UserRole role) {
         List<SchoolMemberResponse> members;
         String message;
         if (schoolId != null) {
-            members = service.getBySchoolId(schoolId);
-            message = "All members from school with ID " + schoolId + " fetched successfully";
+            if (role != null) {
+                members = service.getBySchoolIdAndUserRole(schoolId, role);
+                message = "All " + role + " from school with ID " + schoolId + " fetched successfully";
+            } else {
+                members = service.getBySchoolId(schoolId);
+                message = "All members from school with ID " + schoolId + " fetched successfully";
+            }
         } else {
             members = service.getAll();
             message = "All school members fetched successfully";

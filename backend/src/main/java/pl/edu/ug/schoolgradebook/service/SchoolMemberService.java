@@ -11,6 +11,7 @@ import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberResponse;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberUpdateRequest;
 import pl.edu.ug.schoolgradebook.dto.user.UserRegisterRequest;
 import pl.edu.ug.schoolgradebook.dto.user.UserResponse;
+import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
@@ -102,6 +103,14 @@ public class SchoolMemberService {
             throw new EntityNotFoundException(SchoolMember.class, userId.toString());
         }
         schoolMemberRepository.deleteById(userId);
+    }
+
+    public List<SchoolMemberResponse> getBySchoolIdAndUserRole(UUID schoolId, UserRole role) {
+        return schoolMemberRepository
+                .findBySchool_IdAndUser_Role(schoolId, role)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     private SchoolMemberResponse mapToDto(SchoolMember member) {
