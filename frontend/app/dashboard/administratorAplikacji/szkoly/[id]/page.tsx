@@ -56,7 +56,7 @@ export default function SchoolDetailsPage({
     setError(null);
 
     try {
-      await toggleSchoolActivation(school.id);
+      await toggleSchoolActivation(school.id, !school.isActive);
 
       // Update local state
       setSchool({
