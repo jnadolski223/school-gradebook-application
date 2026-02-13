@@ -336,8 +336,17 @@ export interface SchoolMember {
   lastName: string;
 }
 
+export interface SchoolMemberCreateRequest {
+  schoolId: string;
+  login: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+}
+
 // Tworzy nowego członka szkoły
-export async function createSchoolMember(data: SchoolMember) {
+export async function createSchoolMember(data: SchoolMemberCreateRequest) {
   const response = await fetch(`${API_BASE_URL}/school-members`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
