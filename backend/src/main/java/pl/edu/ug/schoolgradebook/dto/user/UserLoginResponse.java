@@ -7,5 +7,7 @@ import java.util.UUID;
 public record UserLoginResponse(
         UUID id,
         String login,
-        UserRole role
+        UserRole role,
+        UUID schoolId,
+        boolean isActive
 ) {}
