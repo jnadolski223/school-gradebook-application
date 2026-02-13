@@ -50,6 +50,12 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.ok(message, users));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable UUID id) {
+        UserResponse user = service.getUserById(id);
+        return ResponseEntity.ok(ApiResponse.ok("User fetched successfully", user));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
         UserResponse user = service.updateUser(id, request);
