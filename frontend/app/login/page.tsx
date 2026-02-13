@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { loginUser } from "@/lib/api";
 
 export default function LoginPage() {
@@ -183,21 +184,24 @@ export default function LoginPage() {
                 <span style={{ color: "#374151", fontWeight: "500" }}>
                   Chcesz założyć swoją szkołę?
                 </span>
-                <button
-                  type="button"
+                <Link
+                  href="/wniosek"
                   style={{
                     padding: "0.75rem 1rem",
                     backgroundColor: "#3b82f6",
                     color: "white",
                     fontWeight: "600",
-                    border: "none",
                     borderRadius: "20px",
                     cursor: "pointer",
                     fontSize: "1rem",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   Złóż wniosek
-                </button>
+                </Link>
               </div>
             </div>
           </div>
