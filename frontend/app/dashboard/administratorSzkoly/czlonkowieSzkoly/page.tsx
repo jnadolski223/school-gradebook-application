@@ -2,14 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import {
   SchoolMember,
   getAllSchoolMembers,
   deleteSchoolMember,
   getUserById,
-  User,
 } from "@/lib/api";
+import { getUserFromStorage } from "@/lib/auth";
 
 interface MemberWithRole extends SchoolMember {
   role?: string;
@@ -17,27 +16,30 @@ interface MemberWithRole extends SchoolMember {
 
 export default function SchoolMembersPage() {
   const router = useRouter();
-  const { user: userFromStorage, isLoading: authLoading } = useProtectedRoute();
   const [members, setMembers] = useState<MemberWithRole[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!userFromStorage?.schoolID) {
+    const storedUser = getUserFromStorage();
+    if (!storedUser?.schoolID) {
       setError("Brak informacji o szkole");
       return;
     }
-    fetchMembers();
-  }, [userFromStorage?.schoolID, authLoading]);
+    setSchoolId(storedUser.schoolID);
+  }, []);
 
-  async function fetchMembers() {
-    if (!userFromStorage?.schoolID) return;
+  useEffect(() => {
+    if (!schoolId) return;
+    fetchMembers(schoolId);
+  }, [schoolId]);
 
+  async function fetchMembers(targetSchoolId: string) {
     setLoading(true);
     setError(null);
     try {
-      const res = await getAllSchoolMembers(userFromStorage.schoolID);
+      const res = await getAllSchoolMembers(targetSchoolId);
       const membersData = res.data ?? [];
 
       // Fetch user data for each member to get their role
@@ -69,10 +71,6 @@ export default function SchoolMembersPage() {
     } catch (e: any) {
       setError(e?.message ?? "Failed to delete");
     }
-  }
-
-  if (authLoading) {
-    return <div style={{ padding: "2rem" }}>Ładowanie...</div>;
   }
 
   return (
