@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface SchoolMemberRepository extends JpaRepository<SchoolMember, UUID> {
     List<SchoolMember> findBySchool_Id(UUID schoolId);
 
+    List<SchoolMember> findBySchool_IdAndUser_Role(UUID schoolId, UserRole role);
+
     boolean existsBySchool_IdAndUser_Role(UUID schoolId, UserRole role);
 }
