@@ -85,6 +85,14 @@ public class UserService {
         return users.stream().map(this::mapToDto).toList();
     }
 
+    @Transactional(readOnly = true)
+    public UserResponse getUserById(UUID id) {
+        return userRepository
+                .findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new EntityNotFoundException(User.class, id.toString()));
+    }
+
     public UserResponse updateUser(UUID id, UserUpdateRequest request) {
         User user = userRepository
                 .findById(id)
