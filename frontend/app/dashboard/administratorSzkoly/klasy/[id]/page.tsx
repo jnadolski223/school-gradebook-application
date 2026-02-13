@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import {
-  createSchoolClass,
+  getSchoolClassById,
+  updateSchoolClass,
   getAllSchoolMembers,
   updateUser,
+  SchoolClass,
   SchoolMember,
 } from "@/lib/api";
 import { getUserFromStorage } from "@/lib/auth";
@@ -14,8 +16,14 @@ interface TeacherOption extends SchoolMember {
   role?: string;
 }
 
-export default function DodajKlasePage() {
+export default function EdytujKlasePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: classId } = use(params);
   const router = useRouter();
+  const [schoolClass, setSchoolClass] = useState<SchoolClass | null>(null);
   const [name, setName] = useState("");
   const [homeroomTeacherId, setHomeroomTeacherId] = useState("");
   const [teachers, setTeachers] = useState<TeacherOption[]>([]);
@@ -23,6 +31,9 @@ export default function DodajKlasePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [schoolId, setSchoolId] = useState<string | null>(null);
+  const [originalTeacherId, setOriginalTeacherId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const storedUser = getUserFromStorage();
@@ -34,18 +45,30 @@ export default function DodajKlasePage() {
   }, []);
 
   useEffect(() => {
-    if (!schoolId) return;
-    fetchTeachers(schoolId);
-  }, [schoolId]);
+    if (!schoolId || !classId) return;
+    fetchClassAndTeachers(classId, schoolId);
+  }, [schoolId, classId]);
 
-  async function fetchTeachers(targetSchoolId: string) {
+  async function fetchClassAndTeachers(
+    targetClassId: string,
+    targetSchoolId: string,
+  ) {
     setLoading(true);
     setError(null);
     try {
-      const res = await getAllSchoolMembers(targetSchoolId, "TEACHER");
-      setTeachers(res.data ?? []);
+      // Fetch class details
+      const classRes = await getSchoolClassById(targetClassId);
+      const classData = classRes.data;
+      setSchoolClass(classData);
+      setName(classData.name);
+      setHomeroomTeacherId(classData.homeroomTeacherId);
+      setOriginalTeacherId(classData.homeroomTeacherId);
+
+      // Fetch teachers
+      const teachersRes = await getAllSchoolMembers(targetSchoolId, "TEACHER");
+      setTeachers(teachersRes.data ?? []);
     } catch (e: any) {
-      setError(e?.message ?? "Failed to load teachers");
+      setError(e?.message ?? "Failed to load class");
     } finally {
       setLoading(false);
     }
@@ -64,8 +87,8 @@ export default function DodajKlasePage() {
       return;
     }
 
-    if (!schoolId) {
-      setError("Brak informacji o szkole");
+    if (!schoolClass) {
+      setError("Brak danych klasy");
       return;
     }
 
@@ -73,20 +96,27 @@ export default function DodajKlasePage() {
       setSubmitting(true);
       setError(null);
 
-      // Create the class
-      const classResult = await createSchoolClass({
-        schoolId,
-        homeroomTeacherId,
+      // Update the class
+      await updateSchoolClass(schoolClass.id, {
         name,
+        homeroomTeacherId,
       });
 
-      // Update teacher role to HOMEROOM_TEACHER
-      await updateUser(homeroomTeacherId, { role: "HOMEROOM_TEACHER" });
+      // If teacher changed, update roles
+      if (homeroomTeacherId !== originalTeacherId && originalTeacherId) {
+        // Change old teacher role back to TEACHER
+        await updateUser(originalTeacherId, { role: "TEACHER" });
+      }
+
+      // Set new teacher role to HOMEROOM_TEACHER
+      if (homeroomTeacherId !== originalTeacherId) {
+        await updateUser(homeroomTeacherId, { role: "HOMEROOM_TEACHER" });
+      }
 
       // Redirect to classes list
       router.push("/dashboard/administratorSzkoly/klasy");
     } catch (e: any) {
-      setError(e?.message ?? "Failed to create class");
+      setError(e?.message ?? "Failed to update class");
     } finally {
       setSubmitting(false);
     }
@@ -114,7 +144,7 @@ export default function DodajKlasePage() {
           color: "#1f2937",
         }}
       >
-        Dodaj nową klasę
+        Edytuj klasę
       </h2>
 
       {error && (
@@ -150,7 +180,7 @@ export default function DodajKlasePage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nazwa klasy"
+            placeholder="np. 7C"
             style={{
               width: "100%",
               padding: "10px",

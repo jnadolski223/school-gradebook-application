@@ -454,6 +454,11 @@ export interface CreateSchoolClassRequest {
   name: string;
 }
 
+export interface UpdateSchoolClassRequest {
+  homeroomTeacherId: string;
+  name: string;
+}
+
 // Tworzy nową klasę szkolną
 export async function createSchoolClass(data: CreateSchoolClassRequest) {
   const response = await fetch(`${API_BASE_URL}/school-classes`, {
@@ -464,6 +469,24 @@ export async function createSchoolClass(data: CreateSchoolClassRequest) {
 
   if (response.status !== 201) {
     throw new Error("Failed to create school class");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolClass>;
+}
+
+// Aktualizuje klasę szkolną
+export async function updateSchoolClass(
+  id: string,
+  data: UpdateSchoolClassRequest,
+) {
+  const response = await fetch(`${API_BASE_URL}/school-classes/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update school class");
   }
 
   return (await response.json()) as ApiResponse<SchoolClass>;
