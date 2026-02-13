@@ -207,7 +207,7 @@ export interface UserLoginResponse {
   id: string;
   login: string;
   role: UserRole;
-  schoolID: string | null;
+  schoolId: string | null;
   isActive: boolean;
 }
 

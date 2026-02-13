@@ -23,11 +23,11 @@ export default function SchoolMembersPage() {
 
   useEffect(() => {
     const storedUser = getUserFromStorage();
-    if (!storedUser?.schoolID) {
+    if (!storedUser?.schoolId) {
       setError("Brak informacji o szkole");
       return;
     }
-    setSchoolId(storedUser.schoolID);
+    setSchoolId(storedUser.schoolId);
   }, []);
 
   useEffect(() => {
