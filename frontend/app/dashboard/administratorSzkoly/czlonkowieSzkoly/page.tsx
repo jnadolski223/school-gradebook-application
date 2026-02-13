@@ -23,9 +23,13 @@ export default function SchoolMembersPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!userFromStorage?.schoolID) return;
+    if (authLoading) return;
+    if (!userFromStorage?.schoolID) {
+      setError("Brak informacji o szkole");
+      return;
+    }
     fetchMembers();
-  }, [userFromStorage?.schoolID]);
+  }, [userFromStorage?.schoolID, authLoading]);
 
   async function fetchMembers() {
     if (!userFromStorage?.schoolID) return;
@@ -50,7 +54,7 @@ export default function SchoolMembersPage() {
 
       setMembers(membersWithRole);
     } catch (e: any) {
-      setError(e?.message ?? "Failed to load members");
+      setError(e?.message ?? "Błąd podczas ładowania członków");
     } finally {
       setLoading(false);
     }
