@@ -36,7 +36,7 @@ export default function SchoolDetailsPage({
         setSchool(schoolResponse.data);
 
         const adminResponse = await checkSchoolAdminCreated(params.id);
-        setIsAdminCreated(adminResponse.data.data);
+        setIsAdminCreated(adminResponse.data);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Błąd podczas pobierania danych",
