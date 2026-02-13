@@ -129,6 +129,9 @@ export default function SchoolsAdminPage() {
         }}
       >
         <button
+          onClick={() =>
+            (window.location.href = `/dashboard/administratorAplikacji/szkoly/utworz`)
+          }
           style={{
             padding: "0.75rem 1.5rem",
             backgroundColor: "#3b82f6",

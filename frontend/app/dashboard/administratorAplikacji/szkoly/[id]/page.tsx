@@ -392,6 +392,11 @@ export default function SchoolDetailsPage({
             </div>
           ) : (
             <button
+              onClick={() =>
+                router.push(
+                  `/dashboard/administratorAplikacji/szkoly/${school.id}/utworz-administratora`,
+                )
+              }
               style={{
                 padding: "0.75rem 1.5rem",
                 backgroundColor: "#3b82f6",

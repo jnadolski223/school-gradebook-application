@@ -149,6 +149,31 @@ export async function checkSchoolAdminCreated(schoolId: string) {
   return (await response.json()) as ApiResponse<{ data: boolean }>;
 }
 
+// Tworzy nową szkołę
+export interface CreateSchoolRequest {
+  name: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  phoneNumber?: string;
+  email?: string;
+  rspoNumber: string;
+}
+
+export async function createSchool(data: CreateSchoolRequest) {
+  const response = await fetch(`${API_BASE_URL}/schools`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create school");
+  }
+
+  return (await response.json()) as ApiResponse<School>;
+}
+
 // User types
 export type UserRole =
   | "STUDENT"
@@ -377,4 +402,28 @@ export async function deleteSchoolMember(id: string) {
   if (response.status !== 204) {
     throw new Error("Failed to delete school member");
   }
+}
+
+// Tworzy administratora szkoły
+export interface CreateSchoolAdminRequest {
+  schoolId: string;
+  login: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: "SCHOOL_ADMINISTRATOR";
+}
+
+export async function createSchoolAdmin(data: CreateSchoolAdminRequest) {
+  const response = await fetch(`${API_BASE_URL}/school-members`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create school admin");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolMember>;
 }
