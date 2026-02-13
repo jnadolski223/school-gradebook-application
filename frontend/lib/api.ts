@@ -164,6 +164,17 @@ export async function loginUser(data: UserLoginRequest) {
   return (await response.json()) as ApiResponse<UserLoginResponse>;
 }
 
+// Pobiera użytkownika po ID
+export async function getUserById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/users/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch user");
+  }
+
+  return (await response.json()) as ApiResponse<User>;
+}
+
 // Pobiera wszystkich użytkowników
 export async function getAllUsers(active?: boolean) {
   const url = new URL(`${API_BASE_URL}/users`);

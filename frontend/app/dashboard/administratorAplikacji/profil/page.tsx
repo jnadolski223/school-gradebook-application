@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
-import { updateUser } from "@/lib/api";
+import { updateUser, getUserById, User } from "@/lib/api";
 import { saveUserToStorage } from "@/lib/auth";
 
 export default function Profil() {
-  const { user, isLoading } = useProtectedRoute();
+  const { user: userFromStorage, isLoading: authLoading } = useProtectedRoute();
+  const [userData, setUserData] = useState<User | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editedLogin, setEditedLogin] = useState("");
   const [editedPassword, setEditedPassword] = useState("");
@@ -14,24 +16,42 @@ export default function Profil() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    if (user) {
-      setEditedLogin(user.login);
-      // Don't set password from user object as it's typically not returned from backend
-      setEditedPassword("");
-    }
-  }, [user]);
+  // Fetch user data from API when user ID is available
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!userFromStorage?.id) return;
 
-  if (isLoading) {
+      setIsLoadingUser(true);
+      setError(null);
+
+      try {
+        const response = await getUserById(userFromStorage.id);
+        setUserData(response.data);
+        setEditedLogin(response.data.login);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Błąd podczas pobierania danych użytkownika",
+        );
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userFromStorage]);
+
+  if (authLoading || isLoadingUser) {
     return <div style={{ padding: "2rem" }}>Ładowanie...</div>;
   }
 
-  if (!user) {
+  if (!userData || !userFromStorage) {
     return <div style={{ padding: "2rem" }}>Brak danych użytkownika</div>;
   }
 
   const handleSaveChanges = async () => {
-    if (!user) return;
+    if (!userData || !userFromStorage) return;
 
     setIsSaving(true);
     setError(null);
@@ -41,7 +61,7 @@ export default function Profil() {
       // Build update data - only include fields that should be updated
       const updateData: { login?: string; password?: string } = {};
 
-      if (editedLogin && editedLogin !== user.login) {
+      if (editedLogin && editedLogin !== userData.login) {
         updateData.login = editedLogin;
       }
 
@@ -56,14 +76,17 @@ export default function Profil() {
         return;
       }
 
-      const response = await updateUser(user.id, updateData);
+      const response = await updateUser(userFromStorage.id, updateData);
 
       // Update localStorage with new user data
       const updatedUser = {
-        ...user,
+        ...userFromStorage,
         login: response.data.login,
       };
       saveUserToStorage(updatedUser);
+
+      // Update local state with fresh data
+      setUserData(response.data);
 
       setSuccess("Dane zostały zaktualizowane pomyślnie!");
       setEditedPassword("");
@@ -148,7 +171,7 @@ export default function Profil() {
                   fontWeight: "500",
                 }}
               >
-                {user.login}
+                {userData.login}
               </p>
             </div>
 
