@@ -72,34 +72,15 @@ export default function SchoolsAdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [filterActive, setFilterActive] = useState<string>("all"); // "all" | "true" | "false"
-
-  const [selected, setSelected] = useState<School | null>(null);
-  const [idInput, setIdInput] = useState("");
-
-  const [createForm, setCreateForm] = useState<School>({
-    name: "",
-    street: "",
-    postalCode: "",
-    city: "",
-    phoneNumber: "",
-    email: "",
-    rspoNumber: "",
-  });
-
-  const [updateForm, setUpdateForm] = useState<School | null>(null);
-
   const fetchAll = async () => {
     setError(null);
     setLoading(true);
     try {
-      const url =
-        API_BASE + (filterActive === "all" ? "" : `?active=${filterActive}`);
       const res = await apiGet<{
         status: number;
         message: string;
         data: SchoolShort[];
-      }>(url);
+      }>(API_BASE);
       setSchools(res.data || []);
     } catch (e: any) {
       setError(e?.message || String(e));
@@ -110,286 +91,243 @@ export default function SchoolsAdminPage() {
 
   useEffect(() => {
     fetchAll();
-  }, [filterActive]);
+  }, []);
 
-  const handleGetById = async () => {
-    setError(null);
-    setSelected(null);
-    setUpdateForm(null);
-    if (!idInput) return setError("Podaj id");
-    try {
-      const res = await apiGet<{
-        status: number;
-        message: string;
-        data: School;
-      }>(`${API_BASE}/${idInput}`);
-      setSelected(res.data);
-      setUpdateForm(res.data);
-    } catch (e: any) {
-      setError(e?.message || String(e));
-    }
-  };
-
-  const handleCreate = async () => {
-    setError(null);
-    try {
-      const payload = {
-        ...createForm,
-        phoneNumber: createForm.phoneNumber ?? "",
-        email: createForm.email ?? "",
-      };
-      const res = await apiPost<{
-        status: number;
-        message: string;
-        data: School;
-      }>(API_BASE, payload);
-      setSelected(res.data);
-      setCreateForm({
-        name: "",
-        street: "",
-        postalCode: "",
-        city: "",
-        phoneNumber: "",
-        email: "",
-        rspoNumber: "",
-      });
-      await fetchAll();
-    } catch (e: any) {
-      setError(e?.message || String(e));
-    }
-  };
-
-  const handleUpdate = async () => {
-    if (!updateForm || !updateForm.id)
-      return setError("Brak danych do aktualizacji");
-    setError(null);
-    try {
-      const payload = {
-        name: updateForm.name,
-        street: updateForm.street,
-        postalCode: updateForm.postalCode,
-        city: updateForm.city,
-        phoneNumber: updateForm.phoneNumber ?? "",
-        email: updateForm.email ?? "",
-        rspoNumber: updateForm.rspoNumber,
-      };
-      const res = await apiPut<{
-        status: number;
-        message: string;
-        data: School;
-      }>(`${API_BASE}/${updateForm.id}`, payload);
-      setSelected(res.data);
-      await fetchAll();
-    } catch (e: any) {
-      setError(e?.message || String(e));
-    }
-  };
-
-  const handleActivate = async (id: string, activate = true) => {
-    setError(null);
-    try {
-      await apiPatch(`${API_BASE}/${id}/activate${activate ? "" : ""}`); // endpoint same but backend decides action in this spec; if separate, adjust
-      await fetchAll();
-    } catch (e: any) {
-      setError(e?.message || String(e));
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    setError(null);
-    try {
-      await apiDelete(`${API_BASE}/${id}`);
-      if (selected?.id === id) setSelected(null);
-      await fetchAll();
-    } catch (e: any) {
-      setError(e?.message || String(e));
-    }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("pl-PL", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
-    <div>
-      <h1>Szkoły (proste)</h1>
-
-      <div>
-        <button onClick={fetchAll}>Odśwież</button>
-        <label style={{ marginLeft: 8 }}>
-          Filtr aktywności:
-          <select
-            value={filterActive}
-            onChange={(e) => setFilterActive(e.target.value)}
-          >
-            <option value="all">Wszystkie</option>
-            <option value="true">Aktywne</option>
-            <option value="false">Nieaktywne</option>
-          </select>
-        </label>
+    <div style={{ padding: "2rem" }}>
+      {/* Header with Create button */}
+      <div
+        style={{
+          marginBottom: "2rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <button
+          style={{
+            padding: "0.75rem 1.5rem",
+            backgroundColor: "#3b82f6",
+            color: "white",
+            fontWeight: "600",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "0.95rem",
+          }}
+        >
+          Utwórz szkołę
+        </button>
       </div>
 
-      <div>
-        <strong>Status:</strong>{" "}
-        {loading ? "Ładowanie..." : error ? `Błąd: ${error}` : "OK"}
-      </div>
+      {/* Error message */}
+      {error && (
+        <div
+          style={{
+            color: "#991b1b",
+            margin: "0 0 1rem 0",
+            border: "1px solid #dc2626",
+            padding: "0.75rem",
+            backgroundColor: "#fee2e2",
+            borderRadius: "4px",
+            borderLeft: "4px solid #dc2626",
+          }}
+        >
+          {error}
+        </div>
+      )}
 
-      <ul>
-        {schools.map((s) => (
-          <li key={s.id}>
-            {s.id} — {s.schoolName} — {s.isActive ? "active" : "inactive"} —{" "}
-            <button
-              onClick={() => {
-                setIdInput(s.id);
+      {/* Loading state */}
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+          Ładowanie...
+        </div>
+      ) : (
+        /* Schools list */
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {schools.map((school) => (
+            <div
+              key={school.id}
+              style={{
+                backgroundColor: "white",
+                borderRadius: "6px",
+                padding: "1.5rem",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "stretch",
               }}
             >
-              Wybierz
-            </button>{" "}
-            <button onClick={() => handleActivate(s.id, true)}>Aktywuj</button>{" "}
-            <button onClick={() => handleActivate(s.id, false)}>
-              Dezaktywuj
-            </button>{" "}
-            <button onClick={() => handleDelete(s.id)}>Usuń</button>
-          </li>
-        ))}
-      </ul>
+              {/* Left side */}
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {/* School name */}
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "1.25rem",
+                    fontWeight: "600",
+                    color: "#1f2937",
+                  }}
+                >
+                  {school.schoolName}
+                </h3>
 
-      <hr />
+                {/* Date tiles */}
+                <div style={{ display: "flex", gap: "1rem" }}>
+                  {/* Created at */}
+                  <div
+                    style={{
+                      backgroundColor: "#f3f4f6",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      flex: 1,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#6b7280",
+                        marginBottom: "0.25rem",
+                      }}
+                    >
+                      Data i godzina utworzenia
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.9rem",
+                        color: "#1f2937",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {formatDate(school.createdAt)}
+                    </div>
+                  </div>
 
-      <section>
-        <h2>Pobierz szkołę po id</h2>
-        <input
-          value={idInput}
-          onChange={(e) => setIdInput(e.target.value)}
-          placeholder="id"
-        />
-        <button onClick={handleGetById}>Pobierz</button>
+                  {/* Modified at */}
+                  <div
+                    style={{
+                      backgroundColor: "#f3f4f6",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      flex: 1,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#6b7280",
+                        marginBottom: "0.25rem",
+                      }}
+                    >
+                      Data i godzina aktualizacji
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.9rem",
+                        color: "#1f2937",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {formatDate(school.modifiedAt)}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        {selected ? (
-          <div>
-            <h3>Wybrana szkoła:</h3>
-            <pre>{JSON.stringify(selected, null, 2)}</pre>
-          </div>
-        ) : null}
-      </section>
+              {/* Right side */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  marginLeft: "2rem",
+                  minWidth: "180px",
+                }}
+              >
+                {/* Status */}
+                <div
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor: school.isActive ? "#d1fae5" : "#fee2e2",
+                    color: school.isActive ? "#065f46" : "#991b1b",
+                    borderRadius: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                  }}
+                >
+                  {school.isActive ? "Aktywna" : "Nieaktywna"}
+                </div>
 
-      <hr />
-
-      <section>
-        <h2>Utwórz nową szkołę</h2>
-        <div>
-          <input
-            placeholder="name"
-            value={createForm.name}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, name: e.target.value })
-            }
-          />
-          <input
-            placeholder="street"
-            value={createForm.street}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, street: e.target.value })
-            }
-          />
-          <input
-            placeholder="postalCode"
-            value={createForm.postalCode}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, postalCode: e.target.value })
-            }
-          />
-          <input
-            placeholder="city"
-            value={createForm.city}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, city: e.target.value })
-            }
-          />
-          <input
-            placeholder="phoneNumber"
-            value={createForm.phoneNumber}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, phoneNumber: e.target.value })
-            }
-          />
-          <input
-            placeholder="email"
-            value={createForm.email}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, email: e.target.value })
-            }
-          />
-          <input
-            placeholder="rspoNumber"
-            value={createForm.rspoNumber}
-            onChange={(e) =>
-              setCreateForm({ ...createForm, rspoNumber: e.target.value })
-            }
-          />
-        </div>
-        <button onClick={handleCreate}>Utwórz</button>
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>Aktualizuj wybraną szkołę</h2>
-        {updateForm ? (
-          <div>
-            <div>
-              <input
-                placeholder="name"
-                value={updateForm.name}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, name: e.target.value })
-                }
-              />
-              <input
-                placeholder="street"
-                value={updateForm.street}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, street: e.target.value })
-                }
-              />
-              <input
-                placeholder="postalCode"
-                value={updateForm.postalCode}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, postalCode: e.target.value })
-                }
-              />
-              <input
-                placeholder="city"
-                value={updateForm.city}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, city: e.target.value })
-                }
-              />
-              <input
-                placeholder="phoneNumber"
-                value={updateForm.phoneNumber}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, phoneNumber: e.target.value })
-                }
-              />
-              <input
-                placeholder="email"
-                value={updateForm.email}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, email: e.target.value })
-                }
-              />
-              <input
-                placeholder="rspoNumber"
-                value={updateForm.rspoNumber}
-                onChange={(e) =>
-                  setUpdateForm({ ...updateForm, rspoNumber: e.target.value })
-                }
-              />
+                {/* Action buttons */}
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    style={{
+                      padding: "0.5rem 1rem",
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      fontWeight: "600",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Usuń
+                  </button>
+                  <button
+                    style={{
+                      padding: "0.5rem 1rem",
+                      backgroundColor: "#3b82f6",
+                      color: "white",
+                      fontWeight: "600",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Wyświetl
+                  </button>
+                </div>
+              </div>
             </div>
-            <button onClick={handleUpdate}>Zapisz</button>
-          </div>
-        ) : (
-          <div>Brak wybranej szkoły. Pobierz po id aby edytować.</div>
-        )}
-      </section>
+          ))}
+
+          {/* Empty state */}
+          {schools.length === 0 && !loading && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "3rem",
+                color: "#6b7280",
+                backgroundColor: "white",
+                borderRadius: "6px",
+              }}
+            >
+              Brak szkół do wyświetlenia
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
