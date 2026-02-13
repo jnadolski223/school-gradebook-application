@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 type SchoolShort = {
   id: string;
-  schoolName: string;
+  name: string;
   createdAt: string;
   modifiedAt: string;
   isActive: boolean;
@@ -187,7 +187,7 @@ export default function SchoolsAdminPage() {
                     color: "#1f2937",
                   }}
                 >
-                  {school.schoolName}
+                  {school.name}
                 </h3>
 
                 {/* Date tiles */}
