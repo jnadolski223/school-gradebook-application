@@ -71,6 +71,10 @@ export default function AdministratorSzkolyKlasyPage() {
     router.push("/dashboard/administratorSzkoly/klasy/dodaj");
   };
 
+  const handleEditClass = (classId: string) => {
+    router.push(`/dashboard/administratorSzkoly/klasy/${classId}`);
+  };
+
   const handleDeleteClass = async (classId: string) => {
     if (!window.confirm("Are you sure you want to delete this class?")) {
       return;
@@ -162,6 +166,7 @@ export default function AdministratorSzkolyKlasyPage() {
               {/* Right: Action Buttons */}
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
+                  onClick={() => handleEditClass(cls.id)}
                   style={{
                     padding: "8px 16px",
                     backgroundColor: "#3b82f6",
