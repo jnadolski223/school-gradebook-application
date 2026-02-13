@@ -467,21 +467,6 @@ export default function ApplicationPage() {
               </button>
             </div>
           </form>
-
-          {created && (
-            <div
-              style={{
-                marginTop: "1.5rem",
-                borderTop: "1px solid #e5e7eb",
-                paddingTop: "1.5rem",
-              }}
-            >
-              <h3 style={{ marginBottom: "0.75rem" }}>Utworzony wniosek</h3>
-              <pre style={{ margin: 0 }}>
-                {JSON.stringify(created, null, 2)}
-              </pre>
-            </div>
-          )}
         </div>
       </div>
     </div>

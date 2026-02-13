@@ -1,11 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/api";
+import {
+  saveUserToStorage,
+  getRedirectPathByRole,
+  getUserFromStorage,
+} from "@/lib/auth";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -13,6 +21,17 @@ export default function LoginPage() {
     login: "",
     password: "",
   });
+
+  // Check localStorage on page load
+  useEffect(() => {
+    const user = getUserFromStorage();
+    if (user) {
+      const redirectPath = getRedirectPathByRole(user.role);
+      router.push(redirectPath);
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,15 +41,45 @@ export default function LoginPage() {
 
     try {
       const response = await loginUser(loginForm);
+      const user = response.data;
+
+      // Save to localStorage
+      saveUserToStorage(user);
+
       setSuccess("Zalogowano pomyślnie!");
-      console.log("Logged in user:", response.data);
+      console.log("Logged in user:", user);
       setLoginForm({ login: "", password: "" });
+
+      // Redirect based on role
+      const redirectPath = getRedirectPathByRole(user.role);
+      setTimeout(() => {
+        router.push(redirectPath);
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd przy logowaniu");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f9fafb",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <p style={{ color: "#6b7280" }}>Sprawdzanie autentykacji...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
