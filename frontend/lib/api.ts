@@ -437,3 +437,47 @@ export async function createSchoolAdmin(data: CreateSchoolAdminRequest) {
 
   return (await response.json()) as ApiResponse<SchoolMember>;
 }
+
+// --- School Classes API ---
+export interface SchoolClass {
+  id: string;
+  schoolId: string;
+  homeroomTeacherId: string;
+  name: string;
+}
+
+// Pobiera klasy szkolne dla danej szkoły
+export async function getSchoolClassesBySchoolId(schoolId: string) {
+  const url = new URL(`${API_BASE_URL}/school-classes`);
+  url.searchParams.append("schoolId", schoolId);
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch school classes");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolClass[]>;
+}
+
+// Pobiera klasę szkolną po ID
+export async function getSchoolClassById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/school-classes/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch school class");
+  }
+
+  return (await response.json()) as ApiResponse<SchoolClass>;
+}
+
+// Usuwa klasę szkolną
+export async function deleteSchoolClass(id: string) {
+  const response = await fetch(`${API_BASE_URL}/school-classes/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to delete school class");
+  }
+}

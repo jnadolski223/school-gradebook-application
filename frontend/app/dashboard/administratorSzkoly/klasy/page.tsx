@@ -1,81 +1,200 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  getSchoolClassesBySchoolId,
+  deleteSchoolClass,
+  getUserById,
+  SchoolClass,
+} from "@/lib/api";
+import { getUserFromStorage } from "@/lib/auth";
 
-type SchoolClass = {
-  id: string;
-  schoolId: string;
-  homeroomTeacherId: string;
-  name: string;
-};
+interface ClassWithTeacher extends SchoolClass {
+  teacherName?: string;
+}
 
 export default function AdministratorSzkolyKlasyPage() {
-  const [schoolId, setSchoolId] = useState("");
-  const [homeroomTeacherId, setHomeroomTeacherId] = useState("");
-  const [name, setName] = useState("");
-  const [result, setResult] = useState<SchoolClass | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const [classes, setClasses] = useState<ClassWithTeacher[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
+    const storedUser = getUserFromStorage();
+    if (!storedUser?.schoolId) {
+      setError("Brak informacji o szkole");
+      return;
+    }
+    setSchoolId(storedUser.schoolId);
+  }, []);
+
+  useEffect(() => {
+    if (!schoolId) return;
+    fetchClasses(schoolId);
+  }, [schoolId]);
+
+  async function fetchClasses(targetSchoolId: string) {
     setLoading(true);
     setError(null);
-    setResult(null);
     try {
-      const res = await fetch("http://localhost:8080/api/v1/school-classes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ schoolId, homeroomTeacherId, name }),
-      });
+      const result = await getSchoolClassesBySchoolId(targetSchoolId);
+      const classesData = result.data;
 
-      if (res.status === 201) {
-        const json = await res.json();
-        setResult(json.data ?? null);
-      } else {
-        const text = await res.text();
-        throw new Error(`Unexpected status ${res.status}: ${text}`);
-      }
-    } catch (err: any) {
-      setError(err.message ?? "Unknown error");
+      // Fetch teacher names for each class
+      const classesWithTeachers = await Promise.all(
+        classesData.map(async (cls) => {
+          try {
+            const teacherData = await getUserById(cls.homeroomTeacherId);
+            const user = teacherData.data;
+            return {
+              ...cls,
+              teacherName: `${user.login}`,
+            };
+          } catch {
+            return {
+              ...cls,
+              teacherName: "Unknown",
+            };
+          }
+        }),
+      );
+
+      setClasses(classesWithTeachers);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load classes");
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div>
-      <h2>Utwórz nową klasę szkolną (POST /api/v1/school-classes)</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>schoolId</label>
-          <input
-            value={schoolId}
-            onChange={(e) => setSchoolId(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>homeroomTeacherId</label>
-          <input
-            value={homeroomTeacherId}
-            onChange={(e) => setHomeroomTeacherId(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <button type="submit" disabled={loading}>
-          Create
-        </button>
-      </form>
+  const handleAddClass = () => {
+    router.push("/dashboard/administratorSzkoly/klasy/dodaj");
+  };
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {result && (
+  const handleDeleteClass = async (classId: string) => {
+    if (!window.confirm("Are you sure you want to delete this class?")) {
+      return;
+    }
+
+    try {
+      await deleteSchoolClass(classId);
+      setClasses(classes.filter((cls) => cls.id !== classId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete class");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ padding: "20px" }}>
+        <p style={{ color: "#6b7280" }}>Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <button
+        onClick={handleAddClass}
+        style={{
+          padding: "10px 20px",
+          marginBottom: "20px",
+          backgroundColor: "#10b981",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "14px",
+          fontWeight: "500",
+        }}
+      >
+        Dodaj nową klasę
+      </button>
+
+      {error && (
+        <div
+          style={{
+            padding: "10px",
+            marginBottom: "20px",
+            backgroundColor: "#fee2e2",
+            color: "#7f1d1d",
+            borderRadius: "4px",
+            fontSize: "14px",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      {classes.length === 0 ? (
+        <p style={{ color: "#6b7280", textAlign: "center", marginTop: "40px" }}>
+          No classes found
+        </p>
+      ) : (
         <div>
-          <h3>Created (201)</h3>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+          {classes.map((cls) => (
+            <div
+              key={cls.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "15px",
+                marginBottom: "15px",
+                backgroundColor: "#f3f4f6",
+                borderRadius: "8px",
+                gap: "20px",
+              }}
+            >
+              {/* Left: Class Name */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: "16px", fontWeight: "600" }}>
+                  {cls.name}
+                </div>
+              </div>
+
+              {/* Middle: Teacher Name */}
+              <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
+                <div style={{ fontSize: "14px", color: "#6b7280" }}>
+                  {cls.teacherName || "No teacher assigned"}
+                </div>
+              </div>
+
+              {/* Right: Action Buttons */}
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#3b82f6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: "500",
+                  }}
+                >
+                  Edytuj
+                </button>
+                <button
+                  onClick={() => handleDeleteClass(cls.id)}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: "500",
+                  }}
+                >
+                  Usuń
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
