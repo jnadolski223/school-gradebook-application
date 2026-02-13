@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createSchoolMember, registerUser } from "@/lib/api";
+import { createSchoolMember } from "@/lib/api";
 import { getUserFromStorage } from "@/lib/auth";
 
 type AllowedRole = "STUDENT" | "PARENT" | "TEACHER";
@@ -12,10 +12,10 @@ export default function AddMemberPage() {
   const router = useRouter();
   const [schoolId, setSchoolId] = useState<string | null>(null);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<AllowedRole>("STUDENT");
 
   const [error, setError] = useState<string | null>(null);
@@ -52,23 +52,17 @@ export default function AddMemberPage() {
     setIsLoading(true);
 
     try {
-      const userRes = await registerUser({
+      const memberRes = await createSchoolMember({
+        schoolId,
         login,
         password,
+        firstName,
+        lastName,
         role,
       });
 
-      const newUserId = userRes.data.id;
-
-      await createSchoolMember({
-        userId: newUserId,
-        schoolId,
-        firstName,
-        lastName,
-      });
-
       router.push(
-        `/dashboard/administratorSzkoly/czlonkowieSzkoly/${newUserId}`,
+        `/dashboard/administratorSzkoly/czlonkowieSzkoly/${memberRes.data.userId}`,
       );
     } catch (e: any) {
       setError(e?.message ?? "Błąd podczas dodawania członka");
