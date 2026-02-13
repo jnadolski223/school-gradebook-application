@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { updateUser, getUserById, User } from "@/lib/api";
-import { saveUserToStorage } from "@/lib/auth";
+import { saveUserToStorage, clearUserFromStorage } from "@/lib/auth";
 
 export default function Profil() {
+  const router = useRouter();
   const { user: userFromStorage, isLoading: authLoading } = useProtectedRoute();
   const [userData, setUserData] = useState<User | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -104,6 +106,11 @@ export default function Profil() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleLogout = () => {
+    clearUserFromStorage();
+    router.push("/login");
   };
 
   return (
@@ -215,6 +222,21 @@ export default function Profil() {
               }}
             >
               Edytuj dane
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: "0.75rem 1rem",
+                backgroundColor: "#ef4444",
+                color: "white",
+                fontWeight: "600",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "0.95rem",
+              }}
+            >
+              Wyloguj
             </button>
           </>
         ) : (

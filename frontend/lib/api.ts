@@ -146,7 +146,7 @@ export async function checkSchoolAdminCreated(schoolId: string) {
     throw new Error("Failed to check school admin status");
   }
 
-  return (await response.json()) as ApiResponse<{ data: boolean }>;
+  return (await response.json()) as ApiResponse<boolean>;
 }
 
 // Tworzy nową szkołę
