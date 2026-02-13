@@ -88,6 +88,67 @@ export async function deleteSchoolApplication(id: string) {
   }
 }
 
+// --- Schools API ---
+export interface School {
+  id: string;
+  name: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  phoneNumber: string;
+  email: string;
+  rspoNumber: string;
+  createdAt: string;
+  modifiedAt: string;
+  isActive: boolean;
+}
+
+// Pobiera szkołę po ID
+export async function getSchoolById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/schools/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch school");
+  }
+
+  return (await response.json()) as ApiResponse<School>;
+}
+
+// Usuwa szkołę
+export async function deleteSchool(id: string) {
+  const response = await fetch(`${API_BASE_URL}/schools/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to delete school");
+  }
+}
+
+// Aktywuje/deaktywuje szkołę
+export async function toggleSchoolActivation(id: string) {
+  const response = await fetch(`${API_BASE_URL}/schools/${id}/activate`, {
+    method: "PATCH",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to toggle school activation");
+  }
+}
+
+// Sprawdza czy konto administratora szkoły zostało utworzone
+export async function checkSchoolAdminCreated(schoolId: string) {
+  const response = await fetch(
+    `${API_BASE_URL}/schools/${schoolId}/is-school-admin-created`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to check school admin status");
+  }
+
+  return (await response.json()) as ApiResponse<{ data: boolean }>;
+}
+
 // User types
 export type UserRole =
   | "STUDENT"
