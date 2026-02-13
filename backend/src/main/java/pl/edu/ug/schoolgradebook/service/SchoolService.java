@@ -7,7 +7,9 @@ import pl.edu.ug.schoolgradebook.domain.School;
 import pl.edu.ug.schoolgradebook.dto.school.SchoolRequest;
 import pl.edu.ug.schoolgradebook.dto.school.SchoolResponseFull;
 import pl.edu.ug.schoolgradebook.dto.school.SchoolResponseShort;
+import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
+import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
 import pl.edu.ug.schoolgradebook.repository.SchoolRepository;
 
 import java.util.List;
@@ -18,7 +20,8 @@ import java.util.UUID;
 @Transactional
 public class SchoolService {
 
-    private final SchoolRepository repository;
+    private final SchoolRepository schoolRepository;
+    private final SchoolMemberRepository schoolMemberRepository;
 
     public SchoolResponseFull create(SchoolRequest request) {
         School school = School.builder()
@@ -32,7 +35,7 @@ public class SchoolService {
                 .isActive(true)
                 .build();
 
-        repository.save(school);
+        schoolRepository.save(school);
 
         return mapToFullDto(school);
     }
@@ -40,8 +43,8 @@ public class SchoolService {
     @Transactional(readOnly = true)
     public List<SchoolResponseShort> getAll(Boolean active) {
         List<School> schools = active == null
-                ? repository.findAll()
-                : repository.findByIsActive(active);
+                ? schoolRepository.findAll()
+                : schoolRepository.findByIsActive(active);
 
         return schools.stream().map(this::mapToShortDto).toList();
     }
@@ -62,7 +65,7 @@ public class SchoolService {
         school.setEmail(request.email());
         school.setRspoNumber(request.rspoNumber());
 
-        repository.save(school);
+        schoolRepository.save(school);
 
         return mapToFullDto(school);
     }
@@ -70,17 +73,21 @@ public class SchoolService {
     public void activate(UUID id) {
         School school = findSchool(id);
         school.setActive(true);
-        repository.save(school);
+        schoolRepository.save(school);
     }
 
     public void deactivate(UUID id) {
         School school = findSchool(id);
         school.setActive(false);
-        repository.save(school);
+        schoolRepository.save(school);
     }
 
     public void delete(UUID id) {
-        repository.delete(findSchool(id));
+        schoolRepository.delete(findSchool(id));
+    }
+
+    public boolean isSchoolAdminCreated(UUID schoolId) {
+        return schoolMemberRepository.existsBySchool_IdAndUser_Role(schoolId, UserRole.SCHOOL_ADMINISTRATOR);
     }
 
     private SchoolResponseShort mapToShortDto(School school) {
@@ -110,7 +117,7 @@ public class SchoolService {
     }
 
     private School findSchool(UUID id) {
-        return repository
+        return schoolRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(School.class, id.toString()));
     }

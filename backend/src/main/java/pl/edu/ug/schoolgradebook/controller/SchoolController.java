@@ -76,4 +76,14 @@ public class SchoolController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/is-school-admin-created")
+    public ResponseEntity<ApiResponse<Boolean>> isSchoolAdminCreated(@PathVariable UUID id) {
+        boolean isCreated = service.isSchoolAdminCreated(id);
+        if (isCreated) {
+            return ResponseEntity.ok(ApiResponse.ok("School administrator is already created", true));
+        } else {
+            return ResponseEntity.ok(ApiResponse.ok("School administrator is not created", false));
+        }
+    }
 }
