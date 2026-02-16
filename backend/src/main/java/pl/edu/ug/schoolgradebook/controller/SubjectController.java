@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.ug.schoolgradebook.api.ApiPaths;
 import pl.edu.ug.schoolgradebook.dto.ApiResponse;
-import pl.edu.ug.schoolgradebook.dto.subject.SubjectCreateRequest;
+import pl.edu.ug.schoolgradebook.dto.subject.SubjectRequest;
+import pl.edu.ug.schoolgradebook.dto.subject.SubjectRequestName;
 import pl.edu.ug.schoolgradebook.dto.subject.SubjectResponse;
-import pl.edu.ug.schoolgradebook.dto.subject.SubjectUpdateRequest;
 import pl.edu.ug.schoolgradebook.service.SubjectService;
 
 import java.net.URI;
@@ -19,41 +19,42 @@ import java.util.UUID;
 @RequestMapping(ApiPaths.SUBJECTS)
 @RequiredArgsConstructor
 public class SubjectController {
-
     private final SubjectService service;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<SubjectResponse>> create(@RequestBody SubjectCreateRequest request) {
-        SubjectResponse subject = service.create(request);
+    public ResponseEntity<ApiResponse<SubjectResponse>> createSubject(@RequestBody SubjectRequest request) {
+        SubjectResponse subject = service.createSubject(request);
         URI location = URI.create(ApiPaths.SUBJECTS + "/" + subject.id());
-
         return ResponseEntity
                 .created(location)
                 .body(ApiResponse.created("Subject created successfully", subject));
     }
 
+    @GetMapping("/{subjectId}")
+    public ResponseEntity<ApiResponse<SubjectResponse>> getSubjectById(@PathVariable UUID subjectId) {
+        SubjectResponse subject = service.getSubjectById(subjectId);
+        return ResponseEntity.ok(ApiResponse.ok("Subject retrieved successfully", subject));
+    }
+
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SubjectResponse>>> getAllBySchoolId(@RequestParam UUID schoolId) {
-        List<SubjectResponse> subjects = service.getAllBySchool(schoolId);
-        String message = "All subjects for school with ID " + schoolId.toString() + " fetched successfully";
+    public ResponseEntity<ApiResponse<List<SubjectResponse>>> getAllSubjectBySchoolId(@RequestParam UUID schoolId) {
+        List<SubjectResponse> subjects = service.getAllSubjectsBySchool(schoolId);
+        String message = "All subjects for school with ID " + schoolId.toString() + " retrieved successfully";
         return ResponseEntity.ok(ApiResponse.ok(message, subjects));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<SubjectResponse>> getById(@PathVariable UUID id) {
-        SubjectResponse subject = service.getById(id);
-        return ResponseEntity.ok(ApiResponse.ok("Subject fetched successfully", subject));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<SubjectResponse>> update(@PathVariable UUID id, @RequestBody SubjectUpdateRequest request) {
-        SubjectResponse subject = service.update(id, request);
+    @PatchMapping("/{subjectId}")
+    public ResponseEntity<ApiResponse<SubjectResponse>> updateSubjectName(
+            @PathVariable UUID subjectId,
+            @RequestBody SubjectRequestName request
+    ) {
+        SubjectResponse subject = service.updateSubjectName(subjectId, request);
         return ResponseEntity.ok(ApiResponse.ok("Subject updated successfully", subject));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        service.delete(id);
+    @DeleteMapping("/{subjectId}")
+    public ResponseEntity<Void> deleteSubject(@PathVariable UUID subjectId) {
+        service.deleteSubject(subjectId);
         return ResponseEntity.noContent().build();
     }
 }
