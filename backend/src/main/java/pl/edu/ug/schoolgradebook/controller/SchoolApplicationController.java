@@ -38,7 +38,7 @@ public class SchoolApplicationController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SchoolApplicationShortResponse>>> getApplications() {
+    public ResponseEntity<ApiResponse<List<SchoolApplicationShortResponse>>> getAllApplications() {
         List<SchoolApplicationShortResponse> applications = service.getAllApplications();
         return ResponseEntity.ok(ApiResponse.ok("School applications retrieved successfully", applications));
     }
