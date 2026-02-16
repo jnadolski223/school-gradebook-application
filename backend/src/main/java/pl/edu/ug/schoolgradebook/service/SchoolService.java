@@ -4,58 +4,47 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.ug.schoolgradebook.domain.School;
+import pl.edu.ug.schoolgradebook.dto.school.SchoolFullResponse;
 import pl.edu.ug.schoolgradebook.dto.school.SchoolRequest;
-import pl.edu.ug.schoolgradebook.dto.school.SchoolResponseFull;
-import pl.edu.ug.schoolgradebook.dto.school.SchoolResponseShort;
+import pl.edu.ug.schoolgradebook.dto.school.SchoolShortResponse;
 import pl.edu.ug.schoolgradebook.enums.UserRole;
-import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
 import pl.edu.ug.schoolgradebook.repository.SchoolRepository;
+import pl.edu.ug.schoolgradebook.util.mapper.SchoolMapper;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class SchoolService {
-
+@Transactional(readOnly = true)
+public class SchoolService extends EntityService {
     private final SchoolRepository schoolRepository;
     private final SchoolMemberRepository schoolMemberRepository;
+    private final SchoolMapper mapper;
 
-    public SchoolResponseFull create(SchoolRequest request) {
-        School school = School.builder()
-                .name(request.name())
-                .street(request.street())
-                .postalCode(request.postalCode())
-                .city(request.city())
-                .phoneNumber(request.phoneNumber())
-                .email(request.email())
-                .rspoNumber(request.rspoNumber())
-                .isActive(true)
-                .build();
-
-        schoolRepository.save(school);
-
-        return mapToFullDto(school);
+    @Transactional
+    public SchoolFullResponse createSchool(SchoolRequest request) {
+        School school = mapper.mapRequestToEntity(request);
+        return mapper.mapEntityToFullResponse(schoolRepository.save(school));
     }
 
-    @Transactional(readOnly = true)
-    public List<SchoolResponseShort> getAll(Boolean active) {
-        List<School> schools = active == null
-                ? schoolRepository.findAll()
-                : schoolRepository.findByIsActive(active);
-
-        return schools.stream().map(this::mapToShortDto).toList();
+    public SchoolFullResponse getSchoolById(UUID schoolId) {
+        School school = getOrThrow(schoolRepository, School.class, schoolId);
+        return mapper.mapEntityToFullResponse(school);
     }
 
-    @Transactional(readOnly = true)
-    public SchoolResponseFull getById(UUID id) {
-        return mapToFullDto(findSchool(id));
+    public List<SchoolShortResponse> getAllSchools() {
+        return schoolRepository
+                .findAll()
+                .stream()
+                .map(mapper::mapEntityToShortResponse)
+                .toList();
     }
 
-    public SchoolResponseFull update(UUID id, SchoolRequest request) {
-        School school = findSchool(id);
+    @Transactional
+    public SchoolFullResponse updateSchool(UUID schoolId, SchoolRequest request) {
+        School school = getOrThrow(schoolRepository, School.class, schoolId);
 
         school.setName(request.name());
         school.setStreet(request.street());
@@ -65,60 +54,28 @@ public class SchoolService {
         school.setEmail(request.email());
         school.setRspoNumber(request.rspoNumber());
 
-        schoolRepository.save(school);
-
-        return mapToFullDto(school);
+        return mapper.mapEntityToFullResponse(school);
     }
 
-    public void activate(UUID id) {
-        School school = findSchool(id);
+    @Transactional
+    public void deleteSchool(UUID schoolId) {
+        School school = getOrThrow(schoolRepository, School.class, schoolId);
+        schoolRepository.delete(school);
+    }
+
+    @Transactional
+    public void activateSchool(UUID schoolId) {
+        School school = getOrThrow(schoolRepository, School.class, schoolId);
         school.setActive(true);
-        schoolRepository.save(school);
     }
 
-    public void deactivate(UUID id) {
-        School school = findSchool(id);
+    @Transactional
+    public void deactivateSchool(UUID schoolId) {
+        School school = getOrThrow(schoolRepository, School.class, schoolId);
         school.setActive(false);
-        schoolRepository.save(school);
-    }
-
-    public void delete(UUID id) {
-        schoolRepository.delete(findSchool(id));
     }
 
     public boolean isSchoolAdminCreated(UUID schoolId) {
         return schoolMemberRepository.existsBySchool_IdAndUser_Role(schoolId, UserRole.SCHOOL_ADMINISTRATOR);
-    }
-
-    private SchoolResponseShort mapToShortDto(School school) {
-        return new SchoolResponseShort(
-                school.getId(),
-                school.getName(),
-                school.getCreatedAt(),
-                school.getModifiedAt(),
-                school.isActive()
-        );
-    }
-
-    private SchoolResponseFull mapToFullDto(School school) {
-        return new SchoolResponseFull(
-                school.getId(),
-                school.getName(),
-                school.getStreet(),
-                school.getPostalCode(),
-                school.getCity(),
-                school.getPhoneNumber(),
-                school.getEmail(),
-                school.getRspoNumber(),
-                school.getCreatedAt(),
-                school.getModifiedAt(),
-                school.isActive()
-        );
-    }
-
-    private School findSchool(UUID id) {
-        return schoolRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(School.class, id.toString()));
     }
 }

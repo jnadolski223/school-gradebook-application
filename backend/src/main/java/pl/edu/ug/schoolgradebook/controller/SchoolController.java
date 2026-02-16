@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.ug.schoolgradebook.api.ApiPaths;
 import pl.edu.ug.schoolgradebook.dto.ApiResponse;
+import pl.edu.ug.schoolgradebook.dto.school.SchoolFullResponse;
 import pl.edu.ug.schoolgradebook.dto.school.SchoolRequest;
-import pl.edu.ug.schoolgradebook.dto.school.SchoolResponseFull;
-import pl.edu.ug.schoolgradebook.dto.school.SchoolResponseShort;
+import pl.edu.ug.schoolgradebook.dto.school.SchoolShortResponse;
 import pl.edu.ug.schoolgradebook.service.SchoolService;
 
 import java.net.URI;
@@ -19,71 +19,63 @@ import java.util.UUID;
 @RequestMapping(ApiPaths.SCHOOLS)
 @RequiredArgsConstructor
 public class SchoolController {
-
     private final SchoolService service;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<SchoolResponseFull>> create(@RequestBody SchoolRequest request) {
-        SchoolResponseFull school = service.create(request);
+    public ResponseEntity<ApiResponse<SchoolFullResponse>> createSchool(@RequestBody SchoolRequest request) {
+        SchoolFullResponse school = service.createSchool(request);
         URI location = URI.create(ApiPaths.SCHOOLS + "/" + school.id());
-
         return ResponseEntity
                 .created(location)
                 .body(ApiResponse.created("School created successfully", school));
     }
 
+    @GetMapping("/{schoolId}")
+    public ResponseEntity<ApiResponse<SchoolFullResponse>> getSchoolById(@PathVariable UUID schoolId) {
+        SchoolFullResponse school = service.getSchoolById(schoolId);
+        return ResponseEntity.ok(ApiResponse.ok("School retrieved successfully", school));
+    }
+
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SchoolResponseShort>>> getAll(@RequestParam(required = false) Boolean active) {
-        List<SchoolResponseShort> schools = service.getAll(active);
-        String message;
-        if (active == null) {
-            message = "All schools fetched successfully";
-        } else if (active) {
-            message = "All active schools fetched successfully";
-        } else {
-            message = "All inactive schools fetched successfully";
-        }
-
-        return ResponseEntity.ok(ApiResponse.ok(message, schools));
+    public ResponseEntity<ApiResponse<List<SchoolShortResponse>>> getAllSchools() {
+        List<SchoolShortResponse> schools = service.getAllSchools();
+        return ResponseEntity.ok(ApiResponse.ok("All schools retrieved successfully", schools));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<SchoolResponseFull>> getById(@PathVariable UUID id) {
-        SchoolResponseFull school = service.getById(id);
-        return ResponseEntity.ok(ApiResponse.ok("School fetched successfully", school));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<SchoolResponseFull>> update(@PathVariable UUID id, @RequestBody SchoolRequest request) {
-        SchoolResponseFull school = service.update(id, request);
+    @PutMapping("/{schoolId}")
+    public ResponseEntity<ApiResponse<SchoolFullResponse>> updateSchool(
+            @PathVariable UUID schoolId,
+            @RequestBody SchoolRequest request
+    ) {
+        SchoolFullResponse school = service.updateSchool(schoolId, request);
         return ResponseEntity.ok(ApiResponse.ok("School updated successfully", school));
     }
 
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activate(@PathVariable UUID id) {
-        service.activate(id);
+    @DeleteMapping("/{schoolId}")
+    public ResponseEntity<Void> deleteSchool(@PathVariable UUID schoolId) {
+        service.deleteSchool(schoolId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivate(@PathVariable UUID id) {
-        service.deactivate(id);
+    @PatchMapping("/{schoolId}/activate")
+    public ResponseEntity<Void> activateSchool(@PathVariable UUID schoolId) {
+        service.activateSchool(schoolId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        service.delete(id);
+    @PatchMapping("/{schoolId}/deactivate")
+    public ResponseEntity<Void> deactivateSchool(@PathVariable UUID schoolId) {
+        service.deactivateSchool(schoolId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/is-school-admin-created")
-    public ResponseEntity<ApiResponse<Boolean>> isSchoolAdminCreated(@PathVariable UUID id) {
-        boolean isCreated = service.isSchoolAdminCreated(id);
+    @GetMapping("/{schoolId}/is-school-admin-created")
+    public ResponseEntity<ApiResponse<Boolean>> isSchoolAdminCreated(@PathVariable UUID schoolId) {
+        boolean isCreated = service.isSchoolAdminCreated(schoolId);
         if (isCreated) {
-            return ResponseEntity.ok(ApiResponse.ok("School administrator is already created", true));
+            return ResponseEntity.ok(ApiResponse.ok("School administrator has already been created", true));
         } else {
-            return ResponseEntity.ok(ApiResponse.ok("School administrator is not created", false));
+            return ResponseEntity.ok(ApiResponse.ok("School administrator has not been created yet", false));
         }
     }
 }
