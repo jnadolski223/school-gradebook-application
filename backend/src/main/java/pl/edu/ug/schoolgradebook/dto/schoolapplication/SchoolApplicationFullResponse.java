@@ -5,9 +5,17 @@ import pl.edu.ug.schoolgradebook.enums.SchoolApplicationStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record SchoolApplicationResponseShort(
+public record SchoolApplicationFullResponse(
         UUID id,
+        String senderFirstName,
+        String senderLastName,
+        String senderEmail,
         String schoolName,
+        String schoolStreet,
+        String schoolPostalCode,
+        String schoolCity,
+        String rspoNumber,
+        String description,
         Instant createdAt,
         SchoolApplicationStatus status
 ) {}
