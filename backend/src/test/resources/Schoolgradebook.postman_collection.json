@@ -1415,6 +1415,170 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "LessonTime",
+      "item": [
+        {
+          "name": "Create lesson time",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"lessonTimeId\", response.data.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"lessonStart\": \"08:00:00\",\r\n    \"lessonEnd\": \"08:45:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lesson-times",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lesson-times"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get lesson time by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lesson-times/{{lessonTimeId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lesson-times",
+                "{{lessonTimeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all lesson times in school",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lesson-times?schoolId={{schoolId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lesson-times"
+              ],
+              "query": [
+                {
+                  "key": "schoolId",
+                  "value": "{{schoolId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update lesson time",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"lessonStart\": \"08:00:00\",\r\n    \"lessonEnd\": \"08:40:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lesson-times/{{lessonTimeId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lesson-times",
+                "{{lessonTimeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete lesson time",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.unset(\"lessonTimeId\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lesson-times/{{lessonTimeId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lesson-times",
+                "{{lessonTimeId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
