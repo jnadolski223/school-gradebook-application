@@ -824,7 +824,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"jnowak\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Nowak\",\r\n    \"role\": \"SCHOOL_ADMINISTRATOR\"\r\n}",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"akowalska\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Anna\",\r\n    \"lastName\": \"Kowalska\",\r\n    \"role\": \"TEACHER\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1022,12 +1022,27 @@
       "item": [
         {
           "name": "Create school class",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"schoolClassId\", response.data.id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"schoolId\": \"70e500ee-8b73-4bb4-8edc-abfdc7136792\",\r\n    \"homeroomTeacherId\": \"d4c0da50-8cde-4c7a-8827-2511425c716b\",\r\n    \"name\": \"7C\"\r\n}",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"homeroomTeacherId\": \"{{schoolMemberId}}\",\r\n    \"name\": \"7C\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1045,6 +1060,28 @@
                 "api",
                 "v1",
                 "school-classes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get school class by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-classes/{{schoolClassId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-classes",
+                "{{schoolClassId}}"
               ]
             }
           },
@@ -1077,7 +1114,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-classes?schoolId=a8d930c7-115f-40ab-8f63-a1eb1be4108c",
+              "raw": "http://localhost:8080/api/v1/school-classes?schoolId={{schoolId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1091,30 +1128,8 @@
               "query": [
                 {
                   "key": "schoolId",
-                  "value": "a8d930c7-115f-40ab-8f63-a1eb1be4108c"
+                  "value": "{{schoolId}}"
                 }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get school class by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "school-classes",
-                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
               ]
             }
           },
@@ -1127,7 +1142,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"4C\"\r\n}",
+              "raw": "{\r\n    \"homeroomTeacherId\": \"{{schoolMemberId}}\",\r\n    \"name\": \"4C\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1135,7 +1150,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-classes/974ce916-ca49-47aa-bd0b-3e6aff7bef0d",
+              "raw": "http://localhost:8080/api/v1/school-classes/{{schoolClassId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1145,7 +1160,7 @@
                 "api",
                 "v1",
                 "school-classes",
-                "974ce916-ca49-47aa-bd0b-3e6aff7bef0d"
+                "{{schoolClassId}}"
               ]
             }
           },
@@ -1153,11 +1168,25 @@
         },
         {
           "name": "Delete school class",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.unset(\"schoolClassId\");\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-classes/8b5c0e05-df86-4e7e-8975-fa9ed4ca0663",
+              "raw": "http://localhost:8080/api/v1/school-classes/{{schoolClassId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1167,7 +1196,7 @@
                 "api",
                 "v1",
                 "school-classes",
-                "8b5c0e05-df86-4e7e-8975-fa9ed4ca0663"
+                "{{schoolClassId}}"
               ]
             }
           },
