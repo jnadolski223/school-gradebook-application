@@ -565,13 +565,28 @@
       "name": "User",
       "item": [
         {
-          "name": "Register",
+          "name": "Register user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"userId\", response.data.id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"login\": \"anowak456\",\r\n    \"password\": \"AlaMaKota%123&\",\r\n    \"role\": \"STUDENT\"\r\n}",
+              "raw": "{\r\n    \"login\": \"jkowalski\",\r\n    \"password\": \"test123\",\r\n    \"role\": \"APP_ADMINISTRATOR\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -596,13 +611,13 @@
           "response": []
         },
         {
-          "name": "Log in",
+          "name": "Login user",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"login\": \"jkowalski-admin\",\r\n    \"password\": \"test123\"\r\n}",
+              "raw": "{\r\n    \"login\": \"jkowalski\",\r\n    \"password\": \"test123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -621,6 +636,28 @@
                 "v1",
                 "users",
                 "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get user by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/{{userId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId}}"
               ]
             }
           },
@@ -648,62 +685,13 @@
           "response": []
         },
         {
-          "name": "Get active users",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/api/v1/users?active=true",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "users"
-              ],
-              "query": [
-                {
-                  "key": "active",
-                  "value": "true"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get user by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/api/v1/users/77777db4-9b87-4abf-a911-91471960ad13",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "77777db4-9b87-4abf-a911-91471960ad13"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update user",
           "request": {
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"login\": \"jkowalski\",\r\n    \"password\": \"uga_buga_67\",\r\n    \"role\": \"APP_ADMINISTRATOR\"\r\n}",
+              "raw": "{\r\n    \"login\": \"jkowalski-admin\",\r\n    \"password\": \"admin123\",\r\n    \"role\": \"APP_ADMINISTRATOR\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -711,7 +699,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+              "raw": "http://localhost:8080/api/v1/users/{{userId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -721,7 +709,7 @@
                 "api",
                 "v1",
                 "users",
-                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded"
+                "{{userId}}"
               ]
             }
           },
@@ -733,7 +721,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded/activate",
+              "raw": "http://localhost:8080/api/v1/users/{{userId}}/activate",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -743,7 +731,7 @@
                 "api",
                 "v1",
                 "users",
-                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+                "{{userId}}",
                 "activate"
               ]
             }
@@ -756,7 +744,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded/deactivate",
+              "raw": "http://localhost:8080/api/v1/users/{{userId}}/deactivate",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -766,7 +754,7 @@
                 "api",
                 "v1",
                 "users",
-                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+                "{{userId}}",
                 "deactivate"
               ]
             }
@@ -775,11 +763,25 @@
         },
         {
           "name": "Delete user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.unset(\"userId\");\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/users/a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded",
+              "raw": "http://localhost:8080/api/v1/users/{{userId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -789,7 +791,7 @@
                 "api",
                 "v1",
                 "users",
-                "a5b7e11a-0ddd-4133-9e35-fbd7d0ea8ded"
+                "{{userId}}"
               ]
             }
           },
@@ -801,13 +803,28 @@
       "name": "SchoolMember",
       "item": [
         {
-          "name": "Create member",
+          "name": "Create school member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"schoolMemberId\", response.data.userId);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"schoolId\": \"90f2f8e8-c437-4350-bfca-a2e1a27f5fdb\",\r\n    \"login\": \"jnowak\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Nowak\",\r\n    \"role\": \"SCHOOL_ADMINISTRATOR\"\r\n}",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"jnowak\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Nowak\",\r\n    \"role\": \"SCHOOL_ADMINISTRATOR\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -831,7 +848,29 @@
           "response": []
         },
         {
-          "name": "Get all members",
+          "name": "Get school member by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/school-members/{{schoolMemberId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "school-members",
+                "{{schoolMemberId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all school members",
           "request": {
             "method": "GET",
             "header": [],
@@ -852,12 +891,12 @@
           "response": []
         },
         {
-          "name": "Get members in school",
+          "name": "Get all school members in school",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-members?schoolId=70e500ee-8b73-4bb4-8edc-abfdc7136792",
+              "raw": "http://localhost:8080/api/v1/school-members?schoolId={{schoolId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -871,7 +910,7 @@
               "query": [
                 {
                   "key": "schoolId",
-                  "value": "70e500ee-8b73-4bb4-8edc-abfdc7136792"
+                  "value": "{{schoolId}}"
                 }
               ]
             }
@@ -879,12 +918,12 @@
           "response": []
         },
         {
-          "name": "Get all members in school with role",
+          "name": "Get all school members in school with role",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-members?schoolId=d182e9b1-2dca-4824-bd62-eac385d69985&role=TEACHER",
+              "raw": "http://localhost:8080/api/v1/school-members?schoolId={{schoolId}}&role=SCHOOL_ADMINISTRATOR",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -898,11 +937,11 @@
               "query": [
                 {
                   "key": "schoolId",
-                  "value": "d182e9b1-2dca-4824-bd62-eac385d69985"
+                  "value": "{{schoolId}}"
                 },
                 {
                   "key": "role",
-                  "value": "TEACHER"
+                  "value": "SCHOOL_ADMINISTRATOR"
                 }
               ]
             }
@@ -910,29 +949,7 @@
           "response": []
         },
         {
-          "name": "Get member by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "school-members",
-                "e3aa941e-232b-494a-a3fa-fad400147d5b"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Update member",
+          "name": "Update school member",
           "request": {
             "method": "PATCH",
             "header": [],
@@ -946,7 +963,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "raw": "http://localhost:8080/api/v1/school-members/{{schoolMemberId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -956,19 +973,33 @@
                 "api",
                 "v1",
                 "school-members",
-                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+                "{{schoolMemberId}}"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Delete member",
+          "name": "Delete school member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.unset(\"schoolMemberId\");\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/school-members/e3aa941e-232b-494a-a3fa-fad400147d5b",
+              "raw": "http://localhost:8080/api/v1/school-members/{{schoolMemberId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -978,7 +1009,7 @@
                 "api",
                 "v1",
                 "school-members",
-                "e3aa941e-232b-494a-a3fa-fad400147d5b"
+                "{{schoolMemberId}}"
               ]
             }
           },

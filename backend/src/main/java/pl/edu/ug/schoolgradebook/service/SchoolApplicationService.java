@@ -22,17 +22,17 @@ public class SchoolApplicationService extends EntityService {
     private final SchoolApplicationMapper mapper;
 
     @Transactional
-    public SchoolApplicationFullResponse createApplication(SchoolApplicationRequest request) {
+    public SchoolApplicationFullResponse createSchoolApplication(SchoolApplicationRequest request) {
         SchoolApplication application = mapper.mapRequestToEntity(request);
         return mapper.mapEntityToFullResponse(repository.save(application));
     }
 
-    public SchoolApplicationFullResponse getApplicationById(UUID applicationId) {
+    public SchoolApplicationFullResponse getSchoolApplicationById(UUID applicationId) {
         SchoolApplication application = getOrThrow(repository, SchoolApplication.class, applicationId);
         return mapper.mapEntityToFullResponse(application);
     }
 
-    public List<SchoolApplicationShortResponse> getAllApplications() {
+    public List<SchoolApplicationShortResponse> getAllSchoolApplications() {
         return repository
                 .findAll()
                 .stream()
@@ -41,14 +41,14 @@ public class SchoolApplicationService extends EntityService {
     }
 
     @Transactional
-    public SchoolApplicationFullResponse updateApplicationStatus(UUID applicationId, SchoolApplicationStatus status) {
+    public SchoolApplicationFullResponse updateSchoolApplicationStatus(UUID applicationId, SchoolApplicationStatus status) {
         SchoolApplication application = getOrThrow(repository, SchoolApplication.class, applicationId);
         application.setStatus(status);
         return mapper.mapEntityToFullResponse(application);
     }
 
     @Transactional
-    public void deleteApplication(UUID id) {
+    public void deleteSchoolApplication(UUID id) {
         SchoolApplication application = getOrThrow(repository, SchoolApplication.class, id);
         repository.delete(application);
     }

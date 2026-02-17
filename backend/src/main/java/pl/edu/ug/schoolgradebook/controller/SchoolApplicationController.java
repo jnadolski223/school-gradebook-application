@@ -23,8 +23,8 @@ public class SchoolApplicationController {
     private final SchoolApplicationService service;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<SchoolApplicationFullResponse>> createApplication(@RequestBody SchoolApplicationRequest request) {
-        SchoolApplicationFullResponse application = service.createApplication(request);
+    public ResponseEntity<ApiResponse<SchoolApplicationFullResponse>> createSchoolApplication(@RequestBody SchoolApplicationRequest request) {
+        SchoolApplicationFullResponse application = service.createSchoolApplication(request);
         URI location = URI.create(ApiPaths.SCHOOL_APPLICATIONS + "/" + application.id());
         return ResponseEntity
                 .created(location)
@@ -32,29 +32,29 @@ public class SchoolApplicationController {
     }
 
     @GetMapping("/{applicationId}")
-    public ResponseEntity<ApiResponse<SchoolApplicationFullResponse>> getApplicationById(@PathVariable UUID applicationId) {
-        SchoolApplicationFullResponse application = service.getApplicationById(applicationId);
+    public ResponseEntity<ApiResponse<SchoolApplicationFullResponse>> getSchoolApplicationById(@PathVariable UUID applicationId) {
+        SchoolApplicationFullResponse application = service.getSchoolApplicationById(applicationId);
         return ResponseEntity.ok(ApiResponse.ok("School application retrieved successfully", application));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SchoolApplicationShortResponse>>> getAllApplications() {
-        List<SchoolApplicationShortResponse> applications = service.getAllApplications();
+    public ResponseEntity<ApiResponse<List<SchoolApplicationShortResponse>>> getAllSchoolApplications() {
+        List<SchoolApplicationShortResponse> applications = service.getAllSchoolApplications();
         return ResponseEntity.ok(ApiResponse.ok("School applications retrieved successfully", applications));
     }
 
     @PatchMapping("/{applicationId}")
-    public ResponseEntity<ApiResponse<SchoolApplicationFullResponse>> updateApplicationStatus(
+    public ResponseEntity<ApiResponse<SchoolApplicationFullResponse>> updateSchoolApplicationStatus(
             @PathVariable UUID applicationId,
             @RequestBody SchoolApplicationStatusRequest request
     ) {
-        SchoolApplicationFullResponse application = service.updateApplicationStatus(applicationId, request.status());
+        SchoolApplicationFullResponse application = service.updateSchoolApplicationStatus(applicationId, request.status());
         return ResponseEntity.ok(ApiResponse.ok("Status of school application updated successfully", application));
     }
 
     @DeleteMapping("/{applicationId}")
-    public ResponseEntity<Void> deleteApplication(@PathVariable UUID applicationId) {
-        service.deleteApplication(applicationId);
+    public ResponseEntity<Void> deleteSchoolApplication(@PathVariable UUID applicationId) {
+        service.deleteSchoolApplication(applicationId);
         return ResponseEntity.noContent().build();
     }
 }

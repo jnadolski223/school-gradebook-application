@@ -7,25 +7,24 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "school_classes")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = {"school", "homeroomTeacher"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class SchoolClass {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "school_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private School school;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "homeroom_teacher_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
     private SchoolMember homeroomTeacher;
 
-    @Column(nullable = false)
     private String name;
 }

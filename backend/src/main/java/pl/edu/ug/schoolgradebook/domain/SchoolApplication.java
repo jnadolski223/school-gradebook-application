@@ -47,5 +47,4 @@ public class SchoolApplication {
             this.status = SchoolApplicationStatus.PENDING;
         }
     }
-
 }
