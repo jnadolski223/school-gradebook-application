@@ -175,6 +175,31 @@ export async function createSchool(data: CreateSchoolRequest) {
   return (await response.json()) as ApiResponse<School>;
 }
 
+export interface UpdateSchoolRequest {
+  name: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  phoneNumber?: string;
+  email?: string;
+  rspoNumber: string;
+}
+
+// Aktualizuje dane szkoły
+export async function updateSchool(id: string, data: UpdateSchoolRequest) {
+  const response = await fetch(`${API_BASE_URL}/schools/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update school");
+  }
+
+  return (await response.json()) as ApiResponse<School>;
+}
+
 // User types
 export type UserRole =
   | "STUDENT"
@@ -282,7 +307,7 @@ export async function getAllUsers(active?: boolean) {
 // Aktualizuje użytkownika
 export async function updateUser(id: string, data: UserUpdateRequest) {
   const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },

@@ -12,7 +12,11 @@ export default function AdministratorSzkolyLayout({
 
   const navItems = [
     { label: "Profil", href: "/dashboard/administratorSzkoly/profil" },
-    { label: "Członkowie szkoły", href: "/dashboard/administratorSzkoly/czlonkowieSzkoly" },
+    { label: "Dane szkoły", href: "/dashboard/administratorSzkoly/daneSzkoly" },
+    {
+      label: "Członkowie szkoły",
+      href: "/dashboard/administratorSzkoly/czlonkowieSzkoly",
+    },
     { label: "Klasy", href: "/dashboard/administratorSzkoly/klasy" },
     { label: "Przedmioty", href: "/dashboard/administratorSzkoly/przedmioty" },
   ];
