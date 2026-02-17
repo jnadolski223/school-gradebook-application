@@ -9,7 +9,7 @@ import pl.edu.ug.schoolgradebook.domain.User;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberCreateRequest;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberResponse;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberUpdateRequest;
-import pl.edu.ug.schoolgradebook.dto.user.UserRegisterRequest;
+import pl.edu.ug.schoolgradebook.dto.user.UserRequest;
 import pl.edu.ug.schoolgradebook.dto.user.UserResponse;
 import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
@@ -32,12 +32,12 @@ public class SchoolMemberService {
     private final UserService userService;
 
     public SchoolMemberResponse create(SchoolMemberCreateRequest request) {
-        UserRegisterRequest userRegisterRequest = new UserRegisterRequest(
+        UserRequest userRequest = new UserRequest(
                 request.login(),
                 request.password(),
                 request.role()
         );
-        UserResponse createdUser = userService.register(userRegisterRequest);
+        UserResponse createdUser = userService.registerUser(userRequest);
 
         User user = userRepository
                 .findById(createdUser.id())
