@@ -42,9 +42,20 @@ export default function AdministratorSzkolyKlasyPage() {
       const result = await getSchoolClassesBySchoolId(targetSchoolId);
       const classesData = result.data;
 
-      // Fetch all school members to get teacher names
-      const membersResult = await getAllSchoolMembers(targetSchoolId);
-      const allMembers = membersResult.data ?? [];
+      // Fetch teachers and homeroom teachers to get teacher names
+      const [teachersRes, homeroomRes] = await Promise.all([
+        getAllSchoolMembers(targetSchoolId, "TEACHER"),
+        getAllSchoolMembers(targetSchoolId, "HOMEROOM_TEACHER"),
+      ]);
+      const combinedMembers = [
+        ...(teachersRes.data ?? []),
+        ...(homeroomRes.data ?? []),
+      ];
+      const allMembers = Array.from(
+        new Map(
+          combinedMembers.map((member) => [member.userId, member]),
+        ).values(),
+      );
 
       // Fetch teacher names for each class
       const classesWithTeachers = classesData.map((cls) => {

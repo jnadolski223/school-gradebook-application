@@ -64,9 +64,19 @@ export default function EdytujKlasePage({
       setHomeroomTeacherId(classData.homeroomTeacherId);
       setOriginalTeacherId(classData.homeroomTeacherId);
 
-      // Fetch teachers
-      const teachersRes = await getAllSchoolMembers(targetSchoolId, "TEACHER");
-      setTeachers(teachersRes.data ?? []);
+      // Fetch teachers (include current homeroom teacher role)
+      const [teachersRes, homeroomRes] = await Promise.all([
+        getAllSchoolMembers(targetSchoolId, "TEACHER"),
+        getAllSchoolMembers(targetSchoolId, "HOMEROOM_TEACHER"),
+      ]);
+      const combined = [
+        ...(teachersRes.data ?? []),
+        ...(homeroomRes.data ?? []),
+      ];
+      const uniqueByUserId = Array.from(
+        new Map(combined.map((teacher) => [teacher.userId, teacher])).values(),
+      );
+      setTeachers(uniqueByUserId);
     } catch (e: any) {
       setError(e?.message ?? "Failed to load class");
     } finally {
