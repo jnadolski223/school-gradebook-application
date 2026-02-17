@@ -10,4 +10,5 @@ public class ApiPaths {
     public static final String USERS = API_V1 + "/users";
     public static final String SCHOOL_MEMBERS = API_V1 + "/school-members";
     public static final String SCHOOL_CLASSES = API_V1 + "/school-classes";
+    public static final String STUDENTS = API_V1 + "/students";
 }

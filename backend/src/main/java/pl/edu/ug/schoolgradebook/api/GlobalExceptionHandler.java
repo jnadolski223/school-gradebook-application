@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import pl.edu.ug.schoolgradebook.dto.ApiError;
+import pl.edu.ug.schoolgradebook.exception.BadRequestException;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
 import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.exception.UnauthorizedException;
@@ -51,6 +52,14 @@ public class GlobalExceptionHandler {
     // STATUS CODE 400
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiError.of(HttpStatus.BAD_REQUEST, exception.getMessage()));
+    }
+
+    // STATUS CODE 400
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiError> handleBadRequest(BadRequestException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiError.of(HttpStatus.BAD_REQUEST, exception.getMessage()));

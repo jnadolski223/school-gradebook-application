@@ -824,7 +824,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"akowalska\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Anna\",\r\n    \"lastName\": \"Kowalska\",\r\n    \"role\": \"TEACHER\"\r\n}",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"jnowak\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Nowak\",\r\n    \"role\": \"PARENT\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1197,6 +1197,218 @@
                 "v1",
                 "school-classes",
                 "{{schoolClassId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "Create student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"studentId\", response.data.schoolMemberId);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"schoolClassId\": \"{{schoolClassId}}\",\r\n    \"parentId\": \"{{schoolMemberId}}\",\r\n    \"login\": \"mnowak\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Michał\",\r\n    \"lastName\": \"Nowak\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get student by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students/{{studentId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all students in school class",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students?schoolClassId={{schoolClassId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "schoolClassId",
+                  "value": "{{schoolClassId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all students for parent",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students?parentId={{schoolMemberId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "parentId",
+                  "value": "{{schoolMemberId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update student",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"schoolClassId\": \"{{schoolClassId}}\",\r\n    \"parentId\": \"{{schoolMemberId}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students/{{studentId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.unset(\"studentId\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/students/{{studentId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}"
               ]
             }
           },
