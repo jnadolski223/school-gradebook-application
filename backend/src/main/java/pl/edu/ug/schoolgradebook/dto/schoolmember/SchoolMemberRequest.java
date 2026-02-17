@@ -4,7 +4,7 @@ import pl.edu.ug.schoolgradebook.enums.UserRole;
 
 import java.util.UUID;
 
-public record SchoolMemberCreateRequest(
+public record SchoolMemberRequest(
         UUID schoolId,
         String login,
         String password,
