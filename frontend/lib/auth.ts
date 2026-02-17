@@ -26,7 +26,7 @@ export function getRedirectPathByRole(role: string): string {
     case "STUDENT":
       return "/dashboard/uczen";
     case "PARENT":
-      return "/dashboard";
+      return "/dashboard/rodzic";
     default:
       return "/dashboard";
   }
@@ -51,6 +51,9 @@ export function getRequiredRolesForRoute(path: string): string[] {
   }
   if (path.includes("nauczyciel")) {
     return ["TEACHER"];
+  }
+  if (path.includes("rodzic")) {
+    return ["PARENT"];
   }
   if (path.includes("uczen")) {
     return ["STUDENT"];
