@@ -9,6 +9,7 @@ import pl.edu.ug.schoolgradebook.dto.lesson.LessonRequest;
 import pl.edu.ug.schoolgradebook.dto.lesson.LessonResponse;
 import pl.edu.ug.schoolgradebook.service.LessonService;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,18 +20,13 @@ public class LessonController {
     private final LessonService service;
 
     @PostMapping
-    public ResponseEntity<String> createLesson(@RequestBody LessonRequest request) {
-        return ResponseEntity.ok("OK");
+    public ResponseEntity<ApiResponse<LessonResponse>> createLesson(@RequestBody LessonRequest request) {
+        LessonResponse lesson = service.createLesson(request);
+        URI location = URI.create(ApiPaths.LESSONS + "/" + lesson.id());
+        return ResponseEntity
+                .created(location)
+                .body(ApiResponse.created("Lesson created successfully", lesson));
     }
-
-//    @PostMapping
-//    public ResponseEntity<ApiResponse<LessonResponse>> createLesson(@RequestBody LessonRequest request) {
-//        LessonResponse lesson = service.createLesson(request);
-//        URI location = URI.create(ApiPaths.LESSONS + "/" + lesson.id());
-//        return ResponseEntity
-//                .created(location)
-//                .body(ApiResponse.created("Lesson created successfully", lesson));
-//    }
 
     @GetMapping("/{lessonId}")
     public ResponseEntity<ApiResponse<LessonResponse>> getLessonById(@PathVariable UUID lessonId) {
