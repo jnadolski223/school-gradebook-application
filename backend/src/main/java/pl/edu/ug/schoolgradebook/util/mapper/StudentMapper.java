@@ -6,6 +6,8 @@ import pl.edu.ug.schoolgradebook.domain.SchoolMember;
 import pl.edu.ug.schoolgradebook.domain.Student;
 import pl.edu.ug.schoolgradebook.dto.student.StudentResponse;
 
+import java.util.UUID;
+
 @Component
 public class StudentMapper {
     public Student mapRequestToEntity(SchoolMember schoolMember, SchoolMember parent, SchoolClass schoolClass) {
@@ -17,22 +19,11 @@ public class StudentMapper {
     }
 
     public StudentResponse mapEntityToResponse(Student student) {
-        return new StudentResponse(
-                student.getSchoolMemberId(),
-                student.getSchoolClass().getId(),
-                student.getParent().getUserId(),
-                student.getSchoolMember().getSchool().getId(),
-                student.getSchoolMember().getUser().getLogin(),
-                student.getSchoolMember().getFirstName(),
-                student.getSchoolMember().getLastName(),
-                student.getSchoolMember().getUser().getRole()
-        );
-    }
+        UUID schoolClassId = student.getSchoolClass() != null ? student.getSchoolClass().getId() : null;
 
-    public StudentResponse mapEntityToResponseWithoutSchoolId(Student student) {
         return new StudentResponse(
                 student.getSchoolMemberId(),
-                null,
+                schoolClassId,
                 student.getParent().getUserId(),
                 student.getSchoolMember().getSchool().getId(),
                 student.getSchoolMember().getUser().getLogin(),
