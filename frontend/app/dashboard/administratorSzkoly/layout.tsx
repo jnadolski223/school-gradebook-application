@@ -17,6 +17,10 @@ export default function AdministratorSzkolyLayout({
       label: "Członkowie szkoły",
       href: "/dashboard/administratorSzkoly/czlonkowieSzkoly",
     },
+    {
+      label: "Rozkład godzin",
+      href: "/dashboard/administratorSzkoly/rozklad-godzin",
+    },
     { label: "Klasy", href: "/dashboard/administratorSzkoly/klasy" },
     { label: "Przedmioty", href: "/dashboard/administratorSzkoly/przedmioty" },
   ];
