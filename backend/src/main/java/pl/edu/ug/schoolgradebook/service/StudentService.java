@@ -52,13 +52,15 @@ public class StudentService extends EntityService {
             throw new BadRequestException("Parent must have PARENT role");
         }
 
-        SchoolClass schoolClass = null;
         if (request.schoolClassId() != null) {
-            schoolClass = getOrThrow(schoolClassRepository, SchoolClass.class, request.schoolClassId());
+            SchoolClass schoolClass = getOrThrow(schoolClassRepository, SchoolClass.class, request.schoolClassId());
+            Student student = mapper.mapRequestToEntity(member, parent, schoolClass);
+            return mapper.mapEntityToResponse(studentRepository.save(student));
+        } else {
+            Student student = mapper.mapRequestToEntity(member, parent, null);
+            return mapper.mapEntityToResponseWithoutSchoolId(student);
         }
 
-        Student student = mapper.mapRequestToEntity(member, parent, schoolClass);
-        return mapper.mapEntityToResponse(studentRepository.save(student));
     }
 
     public StudentResponse getStudentById(UUID studentId) {

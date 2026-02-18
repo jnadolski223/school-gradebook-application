@@ -28,4 +28,17 @@ public class StudentMapper {
                 student.getSchoolMember().getUser().getRole()
         );
     }
+
+    public StudentResponse mapEntityToResponseWithoutSchoolId(Student student) {
+        return new StudentResponse(
+                student.getSchoolMemberId(),
+                null,
+                student.getParent().getUserId(),
+                student.getSchoolMember().getSchool().getId(),
+                student.getSchoolMember().getUser().getLogin(),
+                student.getSchoolMember().getFirstName(),
+                student.getSchoolMember().getLastName(),
+                student.getSchoolMember().getUser().getRole()
+        );
+    }
 }
