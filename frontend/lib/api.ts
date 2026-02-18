@@ -307,7 +307,7 @@ export async function getAllUsers(active?: boolean) {
 // Aktualizuje użytkownika
 export async function updateUser(id: string, data: UserUpdateRequest) {
   const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },

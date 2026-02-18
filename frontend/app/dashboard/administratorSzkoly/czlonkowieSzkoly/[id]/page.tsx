@@ -11,6 +11,7 @@ import {
   deleteSchoolMember,
   updateUser,
 } from "@/lib/api";
+import { getUserFromStorage } from "@/lib/auth";
 
 type AllowedRole = "STUDENT" | "PARENT" | "TEACHER";
 const allowedRoles: AllowedRole[] = ["STUDENT", "PARENT", "TEACHER"];
@@ -33,6 +34,7 @@ export default function MemberDetailsPage({
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditingSelf, setIsEditingSelf] = useState(false);
 
   // Editable fields
   const [editedFirstName, setEditedFirstName] = useState("");
@@ -54,6 +56,12 @@ export default function MemberDetailsPage({
 
       const userRes = await getUserById(id);
       setUser(userRes.data);
+
+      // Sprawdź czy administrator edytuje swoje własne dane
+      const currentUser = getUserFromStorage();
+      if (currentUser && currentUser.id === id) {
+        setIsEditingSelf(true);
+      }
 
       setEditedFirstName(memberRes.data.firstName);
       setEditedLastName(memberRes.data.lastName);
@@ -101,7 +109,8 @@ export default function MemberDetailsPage({
       if (editedPassword && editedPassword.trim() !== "") {
         userUpdateData.password = editedPassword;
       }
-      if (editedRole && editedRole !== user.role) {
+      // Nie pozwól administratorowi zmieniać swojej własnej roli
+      if (!isEditingSelf && editedRole && editedRole !== user.role) {
         userUpdateData.role = editedRole;
       }
 
@@ -480,6 +489,7 @@ export default function MemberDetailsPage({
               <select
                 value={editedRole}
                 onChange={(e) => setEditedRole(e.target.value as AllowedRole)}
+                disabled={isEditingSelf}
                 style={{
                   width: "100%",
                   boxSizing: "border-box",
@@ -488,7 +498,9 @@ export default function MemberDetailsPage({
                   borderRadius: "6px",
                   fontSize: "0.95rem",
                   fontFamily: "inherit",
-                  backgroundColor: "white",
+                  backgroundColor: isEditingSelf ? "#f3f4f6" : "white",
+                  cursor: isEditingSelf ? "not-allowed" : "pointer",
+                  opacity: isEditingSelf ? 0.6 : 1,
                 }}
               >
                 {allowedRoles.map((role) => (
@@ -497,6 +509,18 @@ export default function MemberDetailsPage({
                   </option>
                 ))}
               </select>
+              {isEditingSelf && (
+                <p
+                  style={{
+                    margin: "0.5rem 0 0 0",
+                    fontSize: "0.875rem",
+                    color: "#6b7280",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Nie możesz zmienić swojej własnej roli
+                </p>
+              )}
             </div>
 
             <div style={{ display: "flex", gap: "0.75rem" }}>
