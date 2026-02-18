@@ -10,7 +10,7 @@ import java.util.UUID;
 @Table(name = "lesson_hours")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "school")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
