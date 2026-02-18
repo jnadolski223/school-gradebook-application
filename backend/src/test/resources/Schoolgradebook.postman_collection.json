@@ -824,7 +824,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"jnowak\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Nowak\",\r\n    \"role\": \"TEACHER\"\r\n}",
+              "raw": "{\r\n    \"schoolId\": \"{{schoolId}}\",\r\n    \"login\": \"jkowalski\",\r\n    \"password\": \"test123\",\r\n    \"firstName\": \"Jan\",\r\n    \"lastName\": \"Kowalski\",\r\n    \"role\": \"PARENT\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1787,6 +1787,193 @@
                 "v1",
                 "lessons",
                 "{{lessonId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Grade",
+      "item": [
+        {
+          "name": "Create grade",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"gradeId\", response.data.id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"studentId\": \"{{studentId}}\",\r\n    \"teacherId\": \"{{schoolMemberId}}\",\r\n    \"subjectId\": \"{{subjectId}}\",\r\n    \"gradeValue\": \"FIVE\",\r\n    \"gradeType\": \"REGULAR_SEMESTER_1\",\r\n    \"weight\": 8,\r\n    \"countToAverage\": true,\r\n    \"description\": \"Sprawdzian z budowy atomu\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/grades",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "grades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get grade by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/grades/{{gradeId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "grades",
+                "{{gradeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all grades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/grades",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "grades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all grades for student",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/grades?studentId={{studentId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "grades"
+              ],
+              "query": [
+                {
+                  "key": "studentId",
+                  "value": "{{studentId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update grade",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"studentId\": \"{{studentId}}\",\r\n    \"teacherId\": \"{{schoolMemberId}}\",\r\n    \"subjectId\": \"{{subjectId}}\",\r\n    \"gradeValue\": \"FIVE_PLUS\",\r\n    \"gradeType\": \"REGULAR_SEMESTER_1\",\r\n    \"weight\": 5,\r\n    \"countToAverage\": true,\r\n    \"description\": \"Odpowiedź ustna\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/grades/{{gradeId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "grades",
+                "{{gradeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete grade",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.unset(\"gradeId\");\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/grades/{{gradeId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "grades",
+                "{{gradeId}}"
               ]
             }
           },
