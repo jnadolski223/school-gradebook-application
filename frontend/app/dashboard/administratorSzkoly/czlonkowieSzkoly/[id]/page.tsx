@@ -43,6 +43,7 @@ export default function MemberDetailsPage({
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditingSelf, setIsEditingSelf] = useState(false);
+  const [isNew, setIsNew] = useState(false);
 
   // Dane ucznia
   const [isStudent, setIsStudent] = useState(false);
@@ -67,6 +68,9 @@ export default function MemberDetailsPage({
     setLoading(true);
     setError(null);
     try {
+      // Oznacz, że edytujemy istniejącego członka (nie nowego)
+      setIsNew(false);
+
       // Najpierw pobierz dane użytkownika aby sprawdzić rolę
       const userRes = await getUserById(id);
       setUser(userRes.data);
@@ -866,7 +870,7 @@ export default function MemberDetailsPage({
                     onChange={(e) =>
                       setEditedRole(e.target.value as AllowedRole)
                     }
-                    disabled={isEditingSelf}
+                    disabled={!isNew}
                     style={{
                       width: "100%",
                       boxSizing: "border-box",
@@ -875,9 +879,9 @@ export default function MemberDetailsPage({
                       borderRadius: "6px",
                       fontSize: "0.95rem",
                       fontFamily: "inherit",
-                      backgroundColor: isEditingSelf ? "#f3f4f6" : "white",
-                      cursor: isEditingSelf ? "not-allowed" : "pointer",
-                      opacity: isEditingSelf ? 0.6 : 1,
+                      backgroundColor: !isNew ? "#f3f4f6" : "white",
+                      cursor: !isNew ? "not-allowed" : "pointer",
+                      opacity: !isNew ? 0.6 : 1,
                     }}
                   >
                     {allowedRoles.map((role) => (
@@ -886,7 +890,7 @@ export default function MemberDetailsPage({
                       </option>
                     ))}
                   </select>
-                  {isEditingSelf && (
+                  {!isNew && (
                     <p
                       style={{
                         margin: "0.5rem 0 0 0",
@@ -895,7 +899,7 @@ export default function MemberDetailsPage({
                         fontStyle: "italic",
                       }}
                     >
-                      Nie możesz zmienić swojej własnej roli
+                      Nie możesz zmienić roli istniejącego członka
                     </p>
                   )}
                 </div>
