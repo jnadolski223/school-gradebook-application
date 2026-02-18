@@ -103,6 +103,7 @@ export default function RodzicProfilPage() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("selectedStudentId");
     clearUserFromStorage();
     router.push("/login");
   };
