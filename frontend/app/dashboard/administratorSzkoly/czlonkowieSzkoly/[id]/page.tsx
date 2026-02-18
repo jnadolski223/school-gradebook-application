@@ -10,6 +10,13 @@ import {
   updateSchoolMember,
   deleteSchoolMember,
   updateUser,
+  getStudentById,
+  updateStudent,
+  deleteStudent,
+  StudentResponse,
+  getSchoolClassesBySchoolId,
+  getAllSchoolMembers,
+  SchoolClass,
 } from "@/lib/api";
 import { getUserFromStorage } from "@/lib/auth";
 
@@ -36,12 +43,20 @@ export default function MemberDetailsPage({
   const [isSaving, setIsSaving] = useState(false);
   const [isEditingSelf, setIsEditingSelf] = useState(false);
 
+  // Dane ucznia
+  const [isStudent, setIsStudent] = useState(false);
+  const [studentData, setStudentData] = useState<StudentResponse | null>(null);
+  const [classList, setClassList] = useState<SchoolClass[]>([]);
+  const [parentsList, setParentsList] = useState<SchoolMember[]>([]);
+
   // Editable fields
   const [editedFirstName, setEditedFirstName] = useState("");
   const [editedLastName, setEditedLastName] = useState("");
   const [editedLogin, setEditedLogin] = useState("");
   const [editedPassword, setEditedPassword] = useState("");
   const [editedRole, setEditedRole] = useState<AllowedRole>("STUDENT");
+  const [editedSchoolClassId, setEditedSchoolClassId] = useState<string>("");
+  const [editedParentId, setEditedParentId] = useState<string>("");
 
   useEffect(() => {
     fetchData();
@@ -51,9 +66,7 @@ export default function MemberDetailsPage({
     setLoading(true);
     setError(null);
     try {
-      const memberRes = await getSchoolMemberById(id);
-      setMember(memberRes.data);
-
+      // Najpierw pobierz dane użytkownika aby sprawdzić rolę
       const userRes = await getUserById(id);
       setUser(userRes.data);
 
@@ -63,12 +76,49 @@ export default function MemberDetailsPage({
         setIsEditingSelf(true);
       }
 
-      setEditedFirstName(memberRes.data.firstName);
-      setEditedLastName(memberRes.data.lastName);
-      setEditedLogin(userRes.data.login);
-      setEditedRole(
-        isAllowedRole(userRes.data.role) ? userRes.data.role : "STUDENT",
-      );
+      // Jeśli to uczeń, użyj dedykowanego endpointu
+      if (userRes.data.role === "STUDENT") {
+        setIsStudent(true);
+        const studentRes = await getStudentById(id);
+        setStudentData(studentRes.data);
+
+        // Ustaw dane do edycji
+        setEditedFirstName(studentRes.data.firstName);
+        setEditedLastName(studentRes.data.lastName);
+        setEditedLogin(studentRes.data.login);
+        setEditedRole("STUDENT");
+        setEditedSchoolClassId(studentRes.data.schoolClassId || "");
+        setEditedParentId(studentRes.data.parentId || "");
+
+        // Pobierz listę klas i rodziców dla ucznia
+        if (studentRes.data.schoolId) {
+          try {
+            const classesRes = await getSchoolClassesBySchoolId(
+              studentRes.data.schoolId,
+            );
+            setClassList(classesRes.data || []);
+
+            const parentsRes = await getAllSchoolMembers(
+              studentRes.data.schoolId,
+              "PARENT",
+            );
+            setParentsList(parentsRes.data || []);
+          } catch (e) {
+            console.error("Błąd podczas ładowania list:", e);
+          }
+        }
+      } else {
+        // Dla PARENT i TEACHER użyj starego endpointu
+        const memberRes = await getSchoolMemberById(id);
+        setMember(memberRes.data);
+
+        setEditedFirstName(memberRes.data.firstName);
+        setEditedLastName(memberRes.data.lastName);
+        setEditedLogin(userRes.data.login);
+        setEditedRole(
+          isAllowedRole(userRes.data.role) ? userRes.data.role : "STUDENT",
+        );
+      }
     } catch (e: any) {
       setError(e?.message ?? "Failed to load member data");
     } finally {
@@ -77,46 +127,110 @@ export default function MemberDetailsPage({
   }
 
   async function handleSaveChanges() {
-    if (!member || !user) return;
+    if ((!member && !studentData) || !user) return;
 
     setIsSaving(true);
     setError(null);
 
     try {
-      // Update school member data
-      const memberUpdateData: Partial<SchoolMember> = {};
-      if (editedFirstName && editedFirstName !== member.firstName) {
-        memberUpdateData.firstName = editedFirstName;
-      }
-      if (editedLastName && editedLastName !== member.lastName) {
-        memberUpdateData.lastName = editedLastName;
-      }
+      if (isStudent && studentData) {
+        // Walidacja - rodzic jest obowiązkowy dla ucznia
+        if (!editedParentId.trim()) {
+          setError("Rodzic jest obowiązkowy dla ucznia");
+          setIsSaving(false);
+          return;
+        }
 
-      if (Object.keys(memberUpdateData).length > 0) {
-        const memberRes = await updateSchoolMember(id, memberUpdateData);
-        setMember(memberRes.data);
-      }
+        const memberUpdateData: Partial<SchoolMember> = {};
+        if (editedFirstName && editedFirstName !== studentData.firstName) {
+          memberUpdateData.firstName = editedFirstName;
+        }
+        if (editedLastName && editedLastName !== studentData.lastName) {
+          memberUpdateData.lastName = editedLastName;
+        }
 
-      // Update user data
-      const userUpdateData: {
-        login?: string;
-        password?: string;
-        role?: AllowedRole;
-      } = {};
-      if (editedLogin && editedLogin !== user.login) {
-        userUpdateData.login = editedLogin;
-      }
-      if (editedPassword && editedPassword.trim() !== "") {
-        userUpdateData.password = editedPassword;
-      }
-      // Nie pozwól administratorowi zmieniać swojej własnej roli
-      if (!isEditingSelf && editedRole && editedRole !== user.role) {
-        userUpdateData.role = editedRole;
-      }
+        if (Object.keys(memberUpdateData).length > 0) {
+          const memberRes = await updateSchoolMember(id, memberUpdateData);
+          setStudentData((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  firstName: memberRes.data.firstName,
+                  lastName: memberRes.data.lastName,
+                }
+              : prev,
+          );
+        }
 
-      if (Object.keys(userUpdateData).length > 0) {
-        const userRes = await updateUser(id, userUpdateData);
-        setUser(userRes.data);
+        const userUpdateData: { login?: string; password?: string } = {};
+        if (editedLogin && editedLogin !== user.login) {
+          userUpdateData.login = editedLogin;
+        }
+        if (editedPassword && editedPassword.trim() !== "") {
+          userUpdateData.password = editedPassword;
+        }
+
+        if (Object.keys(userUpdateData).length > 0) {
+          const userRes = await updateUser(id, userUpdateData);
+          setUser(userRes.data);
+          setStudentData((prev) =>
+            prev ? { ...prev, login: userRes.data.login } : prev,
+          );
+        }
+
+        const studentUpdateData: {
+          schoolClassId?: string | null;
+          parentId?: string;
+        } = {};
+
+        if (editedSchoolClassId !== (studentData.schoolClassId || "")) {
+          studentUpdateData.schoolClassId = editedSchoolClassId || null;
+        }
+        if (editedParentId !== (studentData.parentId || "")) {
+          studentUpdateData.parentId = editedParentId;
+        }
+
+        if (Object.keys(studentUpdateData).length > 0) {
+          const updatedStudent = await updateStudent(id, studentUpdateData);
+          setStudentData(updatedStudent.data);
+        }
+      } else {
+        // Dla PARENT i TEACHER
+        // Update school member data
+        const memberUpdateData: Partial<SchoolMember> = {};
+        if (editedFirstName && member && editedFirstName !== member.firstName) {
+          memberUpdateData.firstName = editedFirstName;
+        }
+        if (editedLastName && member && editedLastName !== member.lastName) {
+          memberUpdateData.lastName = editedLastName;
+        }
+
+        if (Object.keys(memberUpdateData).length > 0) {
+          const memberRes = await updateSchoolMember(id, memberUpdateData);
+          setMember(memberRes.data);
+        }
+
+        // Update user data
+        const userUpdateData: {
+          login?: string;
+          password?: string;
+          role?: AllowedRole;
+        } = {};
+        if (editedLogin && editedLogin !== user.login) {
+          userUpdateData.login = editedLogin;
+        }
+        if (editedPassword && editedPassword.trim() !== "") {
+          userUpdateData.password = editedPassword;
+        }
+        // Nie pozwól administratorowi zmieniać swojej własnej roli
+        if (!isEditingSelf && editedRole && editedRole !== user.role) {
+          userUpdateData.role = editedRole;
+        }
+
+        if (Object.keys(userUpdateData).length > 0) {
+          const userRes = await updateUser(id, userUpdateData);
+          setUser(userRes.data);
+        }
       }
 
       setEditedPassword("");
@@ -138,7 +252,11 @@ export default function MemberDetailsPage({
 
     setError(null);
     try {
-      await deleteSchoolMember(id);
+      if (isStudent) {
+        await deleteStudent(id);
+      } else {
+        await deleteSchoolMember(id);
+      }
       router.push("/dashboard/administratorSzkoly/czlonkowieSzkoly");
     } catch (e: any) {
       setError(e?.message ?? "Failed to delete member");
@@ -153,13 +271,19 @@ export default function MemberDetailsPage({
     );
   }
 
-  if (!member || !user) {
+  if (!user || (!member && !studentData)) {
     return (
       <div style={{ padding: "2rem" }}>
         <div style={{ color: "#991b1b" }}>Nie znaleziono członka</div>
       </div>
     );
   }
+
+  const displayFirstName = isStudent
+    ? studentData?.firstName
+    : member?.firstName;
+  const displayLastName = isStudent ? studentData?.lastName : member?.lastName;
+  const displayLogin = isStudent ? studentData?.login : user.login;
 
   return (
     <div style={{ padding: "2rem", maxWidth: "600px" }}>
@@ -232,7 +356,7 @@ export default function MemberDetailsPage({
                   fontWeight: "500",
                 }}
               >
-                {user.login}
+                {displayLogin}
               </p>
             </div>
 
@@ -278,7 +402,7 @@ export default function MemberDetailsPage({
                   fontWeight: "500",
                 }}
               >
-                {member.firstName}
+                {displayFirstName}
               </p>
             </div>
 
@@ -301,11 +425,11 @@ export default function MemberDetailsPage({
                   fontWeight: "500",
                 }}
               >
-                {member.lastName}
+                {displayLastName}
               </p>
             </div>
 
-            <div style={{ marginBottom: "2rem" }}>
+            <div style={{ marginBottom: "1.5rem" }}>
               <label
                 style={{
                   display: "block",
@@ -327,6 +451,72 @@ export default function MemberDetailsPage({
                 {user.role}
               </p>
             </div>
+
+            {/* Dodatkowe pola dla ucznia */}
+            {isStudent && studentData && (
+              <>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#6b7280",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    Klasa
+                  </label>
+                  <p
+                    style={{
+                      margin: "0",
+                      fontSize: "1rem",
+                      color: "#1f2937",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {studentData.schoolClassId
+                      ? classList.find(
+                          (c) => c.id === studentData.schoolClassId,
+                        )?.name || studentData.schoolClassId
+                      : "Brak"}
+                  </p>
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#6b7280",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    Rodzic
+                  </label>
+                  <p
+                    style={{
+                      margin: "0",
+                      fontSize: "1rem",
+                      color: "#1f2937",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {studentData.parentId
+                      ? (() => {
+                          const parent = parentsList.find(
+                            (p) => p.userId === studentData.parentId,
+                          );
+                          return parent
+                            ? `${parent.firstName} ${parent.lastName}`
+                            : studentData.parentId;
+                        })()
+                      : "Brak"}
+                  </p>
+                </div>
+              </>
+            )}
+
+            <div style={{ marginBottom: "2rem" }} />
 
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <button
@@ -366,162 +556,348 @@ export default function MemberDetailsPage({
         ) : (
           <>
             {/* Edit Mode */}
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  color: "#374151",
-                  fontWeight: "500",
-                }}
-              >
-                Login
-              </label>
-              <input
-                type="text"
-                value={editedLogin}
-                onChange={(e) => setEditedLogin(e.target.value)}
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  fontSize: "0.95rem",
-                  fontFamily: "inherit",
-                }}
-              />
-            </div>
+            {isStudent ? (
+              <>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Login
+                  </label>
+                  <input
+                    type="text"
+                    value={editedLogin}
+                    onChange={(e) => setEditedLogin(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  color: "#374151",
-                  fontWeight: "500",
-                }}
-              >
-                Hasło
-              </label>
-              <input
-                type="password"
-                value={editedPassword}
-                onChange={(e) => setEditedPassword(e.target.value)}
-                placeholder="Zostawiać puste, aby nie zmieniać"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  fontSize: "0.95rem",
-                  fontFamily: "inherit",
-                }}
-              />
-            </div>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Hasło
+                  </label>
+                  <input
+                    type="password"
+                    value={editedPassword}
+                    onChange={(e) => setEditedPassword(e.target.value)}
+                    placeholder="Zostawiać puste, aby nie zmieniać"
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  color: "#374151",
-                  fontWeight: "500",
-                }}
-              >
-                Imię
-              </label>
-              <input
-                type="text"
-                value={editedFirstName}
-                onChange={(e) => setEditedFirstName(e.target.value)}
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  fontSize: "0.95rem",
-                  fontFamily: "inherit",
-                }}
-              />
-            </div>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Imię
+                  </label>
+                  <input
+                    type="text"
+                    value={editedFirstName}
+                    onChange={(e) => setEditedFirstName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  color: "#374151",
-                  fontWeight: "500",
-                }}
-              >
-                Nazwisko
-              </label>
-              <input
-                type="text"
-                value={editedLastName}
-                onChange={(e) => setEditedLastName(e.target.value)}
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  fontSize: "0.95rem",
-                  fontFamily: "inherit",
-                }}
-              />
-            </div>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Nazwisko
+                  </label>
+                  <input
+                    type="text"
+                    value={editedLastName}
+                    onChange={(e) => setEditedLastName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  color: "#374151",
-                  fontWeight: "500",
-                }}
-              >
-                Rola
-              </label>
-              <select
-                value={editedRole}
-                onChange={(e) => setEditedRole(e.target.value as AllowedRole)}
-                disabled={isEditingSelf}
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "0.625rem 0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  fontSize: "0.95rem",
-                  fontFamily: "inherit",
-                  backgroundColor: isEditingSelf ? "#f3f4f6" : "white",
-                  cursor: isEditingSelf ? "not-allowed" : "pointer",
-                  opacity: isEditingSelf ? 0.6 : 1,
-                }}
-              >
-                {allowedRoles.map((role) => (
-                  <option key={role} value={role}>
-                    {role}
-                  </option>
-                ))}
-              </select>
-              {isEditingSelf && (
-                <p
-                  style={{
-                    margin: "0.5rem 0 0 0",
-                    fontSize: "0.875rem",
-                    color: "#6b7280",
-                    fontStyle: "italic",
-                  }}
-                >
-                  Nie możesz zmienić swojej własnej roli
-                </p>
-              )}
-            </div>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Klasa
+                  </label>
+                  <select
+                    value={editedSchoolClassId}
+                    onChange={(e) => setEditedSchoolClassId(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <option value="">-- Brak --</option>
+                    {classList.map((cls) => (
+                      <option key={cls.id} value={cls.id}>
+                        {cls.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Rodzic *
+                  </label>
+                  <select
+                    value={editedParentId}
+                    onChange={(e) => setEditedParentId(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <option value="">-- Wybierz rodzica --</option>
+                    {parentsList.map((parent) => (
+                      <option key={parent.userId} value={parent.userId}>
+                        {parent.firstName} {parent.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Tryb edycji dla PARENT i TEACHER - wszystkie pola edytowalne */}
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Login
+                  </label>
+                  <input
+                    type="text"
+                    value={editedLogin}
+                    onChange={(e) => setEditedLogin(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Hasło
+                  </label>
+                  <input
+                    type="password"
+                    value={editedPassword}
+                    onChange={(e) => setEditedPassword(e.target.value)}
+                    placeholder="Zostawiać puste, aby nie zmieniać"
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Imię
+                  </label>
+                  <input
+                    type="text"
+                    value={editedFirstName}
+                    onChange={(e) => setEditedFirstName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Nazwisko
+                  </label>
+                  <input
+                    type="text"
+                    value={editedLastName}
+                    onChange={(e) => setEditedLastName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "0.5rem",
+                      color: "#374151",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Rola
+                  </label>
+                  <select
+                    value={editedRole}
+                    onChange={(e) =>
+                      setEditedRole(e.target.value as AllowedRole)
+                    }
+                    disabled={isEditingSelf}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "0.625rem 0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                      backgroundColor: isEditingSelf ? "#f3f4f6" : "white",
+                      cursor: isEditingSelf ? "not-allowed" : "pointer",
+                      opacity: isEditingSelf ? 0.6 : 1,
+                    }}
+                  >
+                    {allowedRoles.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
+                  {isEditingSelf && (
+                    <p
+                      style={{
+                        margin: "0.5rem 0 0 0",
+                        fontSize: "0.875rem",
+                        color: "#6b7280",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Nie możesz zmienić swojej własnej roli
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
 
             <div style={{ display: "flex", gap: "0.75rem" }}>
               <button

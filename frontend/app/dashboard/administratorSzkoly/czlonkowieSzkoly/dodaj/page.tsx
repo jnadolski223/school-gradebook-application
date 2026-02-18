@@ -2,7 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createSchoolMember } from "@/lib/api";
+import {
+  createSchoolMember,
+  createStudent,
+  getSchoolClassesBySchoolId,
+  getAllSchoolMembers,
+  SchoolClass,
+  SchoolMember,
+} from "@/lib/api";
 import { getUserFromStorage } from "@/lib/auth";
 
 type AllowedRole = "STUDENT" | "PARENT" | "TEACHER";
@@ -18,6 +25,12 @@ export default function AddMemberPage() {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<AllowedRole>("STUDENT");
 
+  // Pola dla ucznia
+  const [schoolClassId, setSchoolClassId] = useState<string>("");
+  const [parentId, setParentId] = useState<string>("");
+  const [classList, setClassList] = useState<SchoolClass[]>([]);
+  const [parentsList, setParentsList] = useState<SchoolMember[]>([]);
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,6 +42,27 @@ export default function AddMemberPage() {
     }
     setSchoolId(storedUser.schoolId);
   }, []);
+
+  // Pobierz klasy i rodziców gdy mamy schoolId
+  useEffect(() => {
+    if (!schoolId) return;
+
+    async function fetchData() {
+      try {
+        // Pobierz klasy
+        const classesRes = await getSchoolClassesBySchoolId(schoolId!);
+        setClassList(classesRes.data || []);
+
+        // Pobierz rodziców (członków z rolą PARENT)
+        const parentsRes = await getAllSchoolMembers(schoolId!, "PARENT");
+        setParentsList(parentsRes.data || []);
+      } catch (e: any) {
+        console.error("Błąd podczas ładowania danych:", e);
+      }
+    }
+
+    fetchData();
+  }, [schoolId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,21 +83,45 @@ export default function AddMemberPage() {
       return;
     }
 
+    // Dodatkowa walidacja dla ucznia - rodzic jest obowiązkowy
+    if (role === "STUDENT" && !parentId.trim()) {
+      setError("Dla ucznia rodzic jest obowiązkowy");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const memberRes = await createSchoolMember({
-        schoolId,
-        login,
-        password,
-        firstName,
-        lastName,
-        role,
-      });
+      if (role === "STUDENT") {
+        // Użyj dedykowanego endpointu dla ucznia
+        const studentRes = await createStudent({
+          schoolId,
+          schoolClassId: schoolClassId || null,
+          parentId: parentId,
+          login,
+          password,
+          firstName,
+          lastName,
+        });
 
-      router.push(
-        `/dashboard/administratorSzkoly/czlonkowieSzkoly/${memberRes.data.userId}`,
-      );
+        router.push(
+          `/dashboard/administratorSzkoly/czlonkowieSzkoly/${studentRes.data.schoolMemberId}`,
+        );
+      } else {
+        // Dla PARENT i TEACHER użyj starego endpointu
+        const memberRes = await createSchoolMember({
+          schoolId,
+          login,
+          password,
+          firstName,
+          lastName,
+          role,
+        });
+
+        router.push(
+          `/dashboard/administratorSzkoly/czlonkowieSzkoly/${memberRes.data.userId}`,
+        );
+      }
     } catch (e: any) {
       setError(e?.message ?? "Błąd podczas dodawania członka");
     } finally {
@@ -229,7 +287,7 @@ export default function AddMemberPage() {
             />
           </div>
 
-          <div style={{ marginBottom: "2rem" }}>
+          <div style={{ marginBottom: "1.5rem" }}>
             <label
               style={{
                 display: "block",
@@ -261,6 +319,81 @@ export default function AddMemberPage() {
               ))}
             </select>
           </div>
+
+          {/* Dodatkowe pola dla ucznia */}
+          {role === "STUDENT" && (
+            <>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    color: "#374151",
+                    fontWeight: "500",
+                  }}
+                >
+                  Klasa (opcjonalnie)
+                </label>
+                <select
+                  value={schoolClassId}
+                  onChange={(e) => setSchoolClassId(e.target.value)}
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <option value="">-- Brak --</option>
+                  {classList.map((cls) => (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: "2rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    color: "#374151",
+                    fontWeight: "500",
+                  }}
+                >
+                  Rodzic *
+                </label>
+                <select
+                  value={parentId}
+                  onChange={(e) => setParentId(e.target.value)}
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: "0.625rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    fontSize: "0.95rem",
+                    fontFamily: "inherit",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <option value="">-- Wybierz rodzica --</option>
+                  {parentsList.map((parent) => (
+                    <option key={parent.userId} value={parent.userId}>
+                      {parent.firstName} {parent.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
+
+          {role !== "STUDENT" && <div style={{ marginBottom: "2rem" }} />}
 
           <div style={{ display: "flex", gap: "0.75rem" }}>
             <button

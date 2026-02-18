@@ -553,6 +553,103 @@ export async function deleteSchoolClass(id: string) {
   }
 }
 
+// --- Students API ---
+export interface StudentRequest {
+  schoolId: string;
+  schoolClassId: string | null;
+  parentId: string;
+  login: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface StudentResponse {
+  schoolMemberId: string;
+  schoolClassId: string | null;
+  parentId: string | null;
+  schoolId: string;
+  login: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+}
+
+export interface StudentUpdateRequest {
+  schoolClassId?: string | null;
+  parentId?: string;
+}
+
+// Tworzy nowego ucznia
+export async function createStudent(data: StudentRequest) {
+  const response = await fetch(`${API_BASE_URL}/students`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (response.status !== 201) {
+    throw new Error("Failed to create student");
+  }
+
+  return (await response.json()) as ApiResponse<StudentResponse>;
+}
+
+// Pobiera ucznia po ID
+export async function getStudentById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/students/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch student");
+  }
+
+  return (await response.json()) as ApiResponse<StudentResponse>;
+}
+
+// Pobiera wszystkich uczniów
+export async function getAllStudents(
+  schoolClassId?: string,
+  parentId?: string,
+) {
+  const url = new URL(`${API_BASE_URL}/students`);
+  if (schoolClassId) url.searchParams.append("schoolClassId", schoolClassId);
+  if (parentId) url.searchParams.append("parentId", parentId);
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch students");
+  }
+
+  return (await response.json()) as ApiResponse<StudentResponse[]>;
+}
+
+// Aktualizuje ucznia
+export async function updateStudent(id: string, data: StudentUpdateRequest) {
+  const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update student");
+  }
+
+  return (await response.json()) as ApiResponse<StudentResponse>;
+}
+
+// Usuwa ucznia
+export async function deleteStudent(id: string) {
+  const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to delete student");
+  }
+}
+
 // --- Subjects API ---
 export interface Subject {
   id: string;

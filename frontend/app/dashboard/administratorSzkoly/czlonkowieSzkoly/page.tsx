@@ -7,11 +7,17 @@ import {
   getAllSchoolMembers,
   deleteSchoolMember,
   getUserById,
+  getAllStudents,
+  deleteStudent,
+  getSchoolClassesBySchoolId,
+  SchoolClass,
 } from "@/lib/api";
 import { getUserFromStorage } from "@/lib/auth";
 
 interface MemberWithRole extends SchoolMember {
   role?: string;
+  schoolClassId?: string | null;
+  isStudent?: boolean;
 }
 
 export default function SchoolMembersPage() {
@@ -20,6 +26,7 @@ export default function SchoolMembersPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [schoolId, setSchoolId] = useState<string | null>(null);
+  const [classList, setClassList] = useState<SchoolClass[]>([]);
 
   useEffect(() => {
     const storedUser = getUserFromStorage();
@@ -39,22 +46,51 @@ export default function SchoolMembersPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await getAllSchoolMembers(targetSchoolId);
-      const membersData = res.data ?? [];
+      // Pobierz listę klas
+      const classesRes = await getSchoolClassesBySchoolId(targetSchoolId);
+      setClassList(classesRes.data || []);
 
-      // Fetch user data for each member to get their role
+      // Pobierz uczniów
+      const studentsRes = await getAllStudents();
+      const students = studentsRes.data || [];
+
+      // Pobierz pozostałych członków (PARENT, TEACHER)
+      const membersRes = await getAllSchoolMembers(targetSchoolId);
+      const membersData = membersRes.data ?? [];
+
+      // Fetch user data for each non-student member to get their role
       const membersWithRole = await Promise.all(
         membersData.map(async (member) => {
           try {
             const userRes = await getUserById(member.userId);
-            return { ...member, role: userRes.data.role };
+            // Pomiń uczniów (zostali już pobrani przez getAllStudents)
+            if (userRes.data.role === "STUDENT") {
+              return null;
+            }
+            return { ...member, role: userRes.data.role, isStudent: false };
           } catch {
             return member;
           }
         }),
       );
 
-      setMembers(membersWithRole);
+      // Filtruj nulls i połącz z uczniami
+      const validMembers = membersWithRole.filter(
+        (m): m is MemberWithRole => m !== null,
+      );
+
+      // Przekształć uczniów do formatu MemberWithRole
+      const studentsAsMember: MemberWithRole[] = students.map((student) => ({
+        userId: student.schoolMemberId,
+        schoolId: student.schoolId,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        role: student.role,
+        schoolClassId: student.schoolClassId,
+        isStudent: true,
+      }));
+
+      setMembers([...validMembers, ...studentsAsMember]);
     } catch (e: any) {
       setError(e?.message ?? "Błąd podczas ładowania członków");
     } finally {
@@ -62,11 +98,15 @@ export default function SchoolMembersPage() {
     }
   }
 
-  async function handleDelete(userId: string) {
+  async function handleDelete(userId: string, isStudent: boolean) {
     if (!confirm("Czy na pewno chcesz usunąć tego członka szkoły?")) return;
     setError(null);
     try {
-      await deleteSchoolMember(userId);
+      if (isStudent) {
+        await deleteStudent(userId);
+      } else {
+        await deleteSchoolMember(userId);
+      }
       setMembers((m) => m.filter((it) => it.userId !== userId));
     } catch (e: any) {
       setError(e?.message ?? "Failed to delete");
@@ -160,6 +200,23 @@ export default function SchoolMembersPage() {
                 {member.role || "Brak roli"}
               </div>
 
+              {/* Middle Right - Class (for students) */}
+              <div
+                style={{
+                  flex: 1,
+                  textAlign: "center",
+                  color: "#6b7280",
+                  fontWeight: "500",
+                }}
+              >
+                {member.isStudent && member.schoolClassId
+                  ? classList.find((c) => c.id === member.schoolClassId)
+                      ?.name || "Brak klasy"
+                  : member.isStudent
+                    ? "Brak klasy"
+                    : ""}
+              </div>
+
               {/* Right - Buttons */}
               <div
                 style={{
@@ -188,7 +245,9 @@ export default function SchoolMembersPage() {
                   Wyświetl
                 </button>
                 <button
-                  onClick={() => handleDelete(member.userId)}
+                  onClick={() =>
+                    handleDelete(member.userId, member.isStudent || false)
+                  }
                   style={{
                     padding: "0.5rem 1rem",
                     backgroundColor: "#ef4444",
