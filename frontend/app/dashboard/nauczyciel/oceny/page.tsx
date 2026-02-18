@@ -643,7 +643,8 @@ export default function NauczycielOcenyPage() {
             padding: "1.5rem",
             boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             borderLeft: "4px solid #fed7aa",
-            width: "max-content",
+            maxWidth: "100%",
+            overflowX: "auto",
             justifySelf: "start",
           }}
         >

@@ -5,9 +5,11 @@ import Link from "next/link";
 import {
   getGradeById,
   getSubjectById,
+  getSchoolMemberById,
   GradeResponse,
   GradeType,
   GradeValue,
+  SchoolMember,
 } from "@/lib/api";
 
 const gradeValueLabels: Record<GradeValue, string> = {
@@ -50,6 +52,7 @@ export default function RodzicOcenaDetailsPage({ params }: PageProps) {
   const { id } = React.use(params);
   const [grade, setGrade] = useState<GradeResponse | null>(null);
   const [subjectName, setSubjectName] = useState<string | null>(null);
+  const [teacher, setTeacher] = useState<SchoolMember | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +70,13 @@ export default function RodzicOcenaDetailsPage({ params }: PageProps) {
           setSubjectName(subjectRes.data.name);
         } catch {
           setSubjectName(null);
+        }
+
+        try {
+          const teacherRes = await getSchoolMemberById(gradeRes.data.teacherId);
+          setTeacher(teacherRes.data);
+        } catch {
+          setTeacher(null);
         }
       } catch (err) {
         setError("Blad podczas pobierania oceny");
@@ -171,16 +181,11 @@ export default function RodzicOcenaDetailsPage({ params }: PageProps) {
         </div>
 
         <div>
-          <div style={{ color: "#6b7280", fontSize: "0.9rem" }}>Uczen</div>
-          <div style={{ fontWeight: "600", color: "#111827" }}>
-            {grade.studentId}
-          </div>
-        </div>
-
-        <div>
           <div style={{ color: "#6b7280", fontSize: "0.9rem" }}>Nauczyciel</div>
           <div style={{ fontWeight: "600", color: "#111827" }}>
-            {grade.teacherId}
+            {teacher
+              ? `${teacher.firstName} ${teacher.lastName}`
+              : grade.teacherId}
           </div>
         </div>
 
