@@ -1,7 +1,3 @@
-import React from "react";
-
-function oceny() {
-  return <div>STRONA Z OCENAMI NAUCZYCIELA</div>;
+export default function NauczycielOcenyPage() {
+  return <div style={{ padding: "2rem" }}>Oceny (nauczyciel)</div>;
 }
-
-export default oceny;

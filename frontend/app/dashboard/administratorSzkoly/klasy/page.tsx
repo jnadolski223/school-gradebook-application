@@ -42,9 +42,20 @@ export default function AdministratorSzkolyKlasyPage() {
       const result = await getSchoolClassesBySchoolId(targetSchoolId);
       const classesData = result.data;
 
-      // Fetch all school members to get teacher names
-      const membersResult = await getAllSchoolMembers(targetSchoolId);
-      const allMembers = membersResult.data ?? [];
+      // Fetch teachers and homeroom teachers to get teacher names
+      const [teachersRes, homeroomRes] = await Promise.all([
+        getAllSchoolMembers(targetSchoolId, "TEACHER"),
+        getAllSchoolMembers(targetSchoolId, "HOMEROOM_TEACHER"),
+      ]);
+      const combinedMembers = [
+        ...(teachersRes.data ?? []),
+        ...(homeroomRes.data ?? []),
+      ];
+      const allMembers = Array.from(
+        new Map(
+          combinedMembers.map((member) => [member.userId, member]),
+        ).values(),
+      );
 
       // Fetch teacher names for each class
       const classesWithTeachers = classesData.map((cls) => {
@@ -73,6 +84,10 @@ export default function AdministratorSzkolyKlasyPage() {
 
   const handleEditClass = (classId: string) => {
     router.push(`/dashboard/administratorSzkoly/klasy/${classId}`);
+  };
+
+  const handleViewSchedule = (classId: string) => {
+    router.push(`/dashboard/administratorSzkoly/klasy/${classId}/plan-lekcji`);
   };
 
   const handleDeleteClass = async (classId: string) => {
@@ -149,22 +164,39 @@ export default function AdministratorSzkolyKlasyPage() {
                 gap: "20px",
               }}
             >
-              {/* Left: Class Name */}
+              {/* Left: Class Name and Teacher */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: "16px", fontWeight: "600" }}>
                   {cls.name}
                 </div>
-              </div>
-
-              {/* Middle: Teacher Name */}
-              <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
-                <div style={{ fontSize: "14px", color: "#6b7280" }}>
-                  {cls.teacherName || "No teacher assigned"}
+                <div
+                  style={{
+                    fontSize: "13px",
+                    color: "#6b7280",
+                    marginTop: "4px",
+                  }}
+                >
+                  Wychowawca: {cls.teacherName || "Nie przydzielono"}
                 </div>
               </div>
 
               {/* Right: Action Buttons */}
               <div style={{ display: "flex", gap: "10px" }}>
+                <button
+                  onClick={() => handleViewSchedule(cls.id)}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: "500",
+                  }}
+                >
+                  Plan lekcji
+                </button>
                 <button
                   onClick={() => handleEditClass(cls.id)}
                   style={{

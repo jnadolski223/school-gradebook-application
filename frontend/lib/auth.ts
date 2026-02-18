@@ -23,10 +23,12 @@ export function getRedirectPathByRole(role: string): string {
       return "/dashboard/administratorSzkoly";
     case "TEACHER":
       return "/dashboard/nauczyciel";
+    case "HOMEROOM_TEACHER":
+      return "/dashboard/nauczyciel";
     case "STUDENT":
       return "/dashboard/uczen";
     case "PARENT":
-      return "/dashboard";
+      return "/dashboard/rodzic";
     default:
       return "/dashboard";
   }
@@ -50,7 +52,10 @@ export function getRequiredRolesForRoute(path: string): string[] {
     return ["SCHOOL_ADMINISTRATOR"];
   }
   if (path.includes("nauczyciel")) {
-    return ["TEACHER"];
+    return ["TEACHER", "HOMEROOM_TEACHER"];
+  }
+  if (path.includes("rodzic")) {
+    return ["PARENT"];
   }
   if (path.includes("uczen")) {
     return ["STUDENT"];

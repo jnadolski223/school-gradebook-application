@@ -2,32 +2,44 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 
-export default function AdministratorSzkolyLayout({
+export default function RodzicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { isAuthorized, isLoading } = useProtectedRoute();
 
   const navItems = [
-    { label: "Profil", href: "/dashboard/administratorSzkoly/profil" },
-    { label: "Dane szkoły", href: "/dashboard/administratorSzkoly/daneSzkoly" },
+    { label: "Profil", href: "/dashboard/rodzic/profil" },
+    { label: "Oceny", href: "/dashboard/rodzic/oceny" },
+    { label: "Plan zajec", href: "/dashboard/rodzic/plan-zajec" },
     {
-      label: "Członkowie szkoły",
-      href: "/dashboard/administratorSzkoly/czlonkowieSzkoly",
+      label: "Informacje o szkole",
+      href: "/dashboard/rodzic/informacje-o-szkole",
     },
-    {
-      label: "Rozkład godzin",
-      href: "/dashboard/administratorSzkoly/rozklad-godzin",
-    },
-    { label: "Klasy", href: "/dashboard/administratorSzkoly/klasy" },
-    { label: "Przedmioty", href: "/dashboard/administratorSzkoly/przedmioty" },
   ];
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <p>Ladowanie...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <p>Brak dostepu</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
-      {/* Navbar */}
       <nav
         style={{
           backgroundColor: "white",
@@ -49,12 +61,12 @@ export default function AdministratorSzkolyLayout({
             style={{
               fontSize: "1.5rem",
               fontWeight: "600",
-              color: "#10b981",
+              color: "#db2777",
               margin: 0,
               flex: 1,
             }}
           >
-            Administrator Szkoły
+            Rodzic
           </h1>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {navItems.map((item) => {
@@ -65,7 +77,7 @@ export default function AdministratorSzkolyLayout({
                   href={item.href}
                   style={{
                     padding: "0.75rem 1rem",
-                    backgroundColor: isActive ? "#10b981" : "#e5e7eb",
+                    backgroundColor: isActive ? "#db2777" : "#e5e7eb",
                     color: isActive ? "white" : "#1f2937",
                     textDecoration: "none",
                     borderRadius: "6px",
@@ -83,7 +95,6 @@ export default function AdministratorSzkolyLayout({
         </div>
       </nav>
 
-      {/* Content */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 2rem" }}>
         {children}
       </div>
