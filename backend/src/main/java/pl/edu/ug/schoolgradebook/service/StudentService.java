@@ -95,12 +95,18 @@ public class StudentService extends EntityService {
     public StudentResponse updateStudent(UUID studentId, StudentUpdateRequest request) {
         Student student = getOrThrow(studentRepository, Student.class, studentId);
 
-        if (request.schoolClassId() != null && request.schoolClassId() != student.getSchoolClass().getId()) {
-            SchoolClass schoolClass = getOrThrow(schoolClassRepository, SchoolClass.class, request.schoolClassId());
-            student.setSchoolClass(schoolClass);
+        if (request.schoolClassId() != null) {
+            // Assign new class if different from current
+            if (student.getSchoolClass() == null || !request.schoolClassId().equals(student.getSchoolClass().getId())) {
+                SchoolClass schoolClass = getOrThrow(schoolClassRepository, SchoolClass.class, request.schoolClassId());
+                student.setSchoolClass(schoolClass);
+            }
+        } else {
+            // Remove class if request is null
+            student.setSchoolClass(null);
         }
 
-        if (request.parentId() != null && request.parentId() != student.getParent().getUserId()) {
+        if (request.parentId() != null && (student.getParent() == null || !request.parentId().equals(student.getParent().getUserId()))) {
             SchoolMember parent = getOrThrow(schoolMemberRepository, SchoolMember.class, request.parentId());
             student.setParent(parent);
         }
