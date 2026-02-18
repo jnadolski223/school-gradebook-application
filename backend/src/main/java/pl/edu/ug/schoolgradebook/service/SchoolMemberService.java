@@ -6,85 +6,82 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.ug.schoolgradebook.domain.School;
 import pl.edu.ug.schoolgradebook.domain.SchoolMember;
 import pl.edu.ug.schoolgradebook.domain.User;
-import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberCreateRequest;
+import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberRequest;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberResponse;
 import pl.edu.ug.schoolgradebook.dto.schoolmember.SchoolMemberUpdateRequest;
-import pl.edu.ug.schoolgradebook.dto.user.UserRegisterRequest;
+import pl.edu.ug.schoolgradebook.dto.user.UserRequest;
 import pl.edu.ug.schoolgradebook.dto.user.UserResponse;
 import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
-import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
 import pl.edu.ug.schoolgradebook.repository.SchoolRepository;
 import pl.edu.ug.schoolgradebook.repository.UserRepository;
+import pl.edu.ug.schoolgradebook.util.mapper.SchoolMemberMapper;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class SchoolMemberService {
-
+@Transactional(readOnly = true)
+public class SchoolMemberService extends EntityService {
     private final SchoolMemberRepository schoolMemberRepository;
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
     private final UserService userService;
+    private final SchoolMemberMapper mapper;
 
-    public SchoolMemberResponse create(SchoolMemberCreateRequest request) {
-        UserRegisterRequest userRegisterRequest = new UserRegisterRequest(
+    @Transactional
+    public SchoolMemberResponse createSchoolMember(SchoolMemberRequest request) {
+        UserRequest userRequest = new UserRequest(
                 request.login(),
                 request.password(),
                 request.role()
         );
-        UserResponse createdUser = userService.register(userRegisterRequest);
-
-        User user = userRepository
-                .findById(createdUser.id())
-                .orElseThrow(() -> new EntityNotFoundException(User.class, createdUser.id().toString()));
-
-
-        School school = schoolRepository
-                .findById(request.schoolId())
-                .orElseThrow(() -> new EntityNotFoundException(School.class, request.schoolId().toString()));
+        UserResponse createdUser = userService.registerUser(userRequest);
+        User user = getOrThrow(userRepository, User.class, createdUser.id());
+        School school = getOrThrow(schoolRepository, School.class, request.schoolId());
 
         if (schoolMemberRepository.existsById(user.getId())) {
             throw new ConflictException("User is already a school member");
         }
 
-        SchoolMember member = SchoolMember.builder()
-                .user(user)
-                .school(school)
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .build();
-
-        schoolMemberRepository.save(member);
-        return mapToDto(member);
+        SchoolMember member = mapper.mapRequestToEntity(request, user, school);
+        return mapper.mapEntityToResponse(schoolMemberRepository.save(member));
     }
 
-    @Transactional(readOnly = true)
-    public List<SchoolMemberResponse> getAll() {
-        return schoolMemberRepository.findAll().stream().map(this::mapToDto).toList();
+    public SchoolMemberResponse getSchoolMemberById(UUID schoolMemberId) {
+        SchoolMember member = getOrThrow(schoolMemberRepository, SchoolMember.class, schoolMemberId);
+        return mapper.mapEntityToResponse(member);
     }
 
-    @Transactional(readOnly = true)
-    public List<SchoolMemberResponse> getBySchoolId(UUID schoolId) {
-        return schoolMemberRepository.findBySchool_Id(schoolId).stream().map(this::mapToDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public SchoolMemberResponse getById(UUID userId) {
+    public List<SchoolMemberResponse> getAllSchoolMembers() {
         return schoolMemberRepository
-                .findById(userId)
-                .map(this::mapToDto)
-                .orElseThrow(() -> new EntityNotFoundException(SchoolMember.class, userId.toString()));
+                .findAll()
+                .stream()
+                .map(mapper::mapEntityToResponse)
+                .toList();
     }
 
-    public  SchoolMemberResponse update(UUID userId, SchoolMemberUpdateRequest request) {
-        SchoolMember member = schoolMemberRepository
-                .findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(SchoolMember.class, userId.toString()));
+    public List<SchoolMemberResponse> getAllSchoolMembersBySchoolId(UUID schoolId) {
+        return schoolMemberRepository
+                .findBySchool_Id(schoolId)
+                .stream()
+                .map(mapper::mapEntityToResponse)
+                .toList();
+    }
+
+    public List<SchoolMemberResponse> getAllSchoolMembersBySchoolIdAndUserRole(UUID schoolId, UserRole role) {
+        return schoolMemberRepository
+                .findBySchool_IdAndUser_Role(schoolId, role)
+                .stream()
+                .map(mapper::mapEntityToResponse)
+                .toList();
+    }
+
+    @Transactional
+    public  SchoolMemberResponse updateSchoolMember(UUID schoolMemberId, SchoolMemberUpdateRequest request) {
+        SchoolMember member = getOrThrow(schoolMemberRepository, SchoolMember.class, schoolMemberId);
 
         if (request.firstName() != null) {
             member.setFirstName(request.firstName());
@@ -94,33 +91,12 @@ public class SchoolMemberService {
             member.setLastName(request.lastName());
         }
 
-        schoolMemberRepository.save(member);
-        return mapToDto(member);
+        return mapper.mapEntityToResponse(member);
     }
 
-    public void delete(UUID userId) {
-        if (!schoolMemberRepository.existsById(userId)) {
-            throw new EntityNotFoundException(SchoolMember.class, userId.toString());
-        }
-        schoolMemberRepository.deleteById(userId);
-    }
-
-    public List<SchoolMemberResponse> getBySchoolIdAndUserRole(UUID schoolId, UserRole role) {
-        return schoolMemberRepository
-                .findBySchool_IdAndUser_Role(schoolId, role)
-                .stream()
-                .map(this::mapToDto)
-                .toList();
-    }
-
-    private SchoolMemberResponse mapToDto(SchoolMember member) {
-        return new SchoolMemberResponse(
-                member.getUser().getId(),
-                member.getSchool().getId(),
-                member.getUser().getLogin(),
-                member.getFirstName(),
-                member.getLastName(),
-                member.getUser().getRole()
-        );
+    @Transactional
+    public void deleteSchoolMember(UUID schoolMemberId) {
+        SchoolMember member = getOrThrow(schoolMemberRepository, SchoolMember.class, schoolMemberId);
+        schoolMemberRepository.delete(member);
     }
 }

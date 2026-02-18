@@ -5,148 +5,120 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.ug.schoolgradebook.domain.SchoolMember;
 import pl.edu.ug.schoolgradebook.domain.User;
-import pl.edu.ug.schoolgradebook.dto.user.*;
+import pl.edu.ug.schoolgradebook.dto.user.UserLoginRequest;
+import pl.edu.ug.schoolgradebook.dto.user.UserLoginResponse;
+import pl.edu.ug.schoolgradebook.dto.user.UserRequest;
+import pl.edu.ug.schoolgradebook.dto.user.UserResponse;
 import pl.edu.ug.schoolgradebook.enums.UserRole;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
-import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
+import pl.edu.ug.schoolgradebook.exception.UnauthorizedException;
 import pl.edu.ug.schoolgradebook.repository.SchoolMemberRepository;
 import pl.edu.ug.schoolgradebook.repository.UserRepository;
+import pl.edu.ug.schoolgradebook.util.mapper.UserMapper;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class UserService {
-
+@Transactional(readOnly = true)
+public class UserService extends EntityService {
     private final UserRepository userRepository;
     private final SchoolMemberRepository schoolMemberRepository;
+    private final UserMapper mapper;
 
-    public UserResponse register(UserRegisterRequest request) {
+    @Transactional
+    public UserResponse registerUser(UserRequest request) {
         if (userRepository.existsByLogin(request.login())) {
             throw new ConflictException("Login is taken by another user");
         }
-
-        User user = User.builder()
-                .login(request.login())
-                .password(request.password())
-                .role(request.role())
-                .isActive(true)
-                .build();
-
-        userRepository.save(user);
-        return mapToDto(user);
+        User user = mapper.mapRequestToEntity(request);
+        return mapper.mapEntityToResponse(userRepository.save(user));
     }
 
-    public UserLoginResponse login(UserLoginRequest request) {
+    public UserLoginResponse loginUser(UserLoginRequest request) {
         User user = userRepository
                 .findByLogin(request.login())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid login or password"));
-
-        if (!user.isActive()) {
-            throw new IllegalArgumentException("User is inactive");
-        }
-
+                .orElseThrow(this::unauthorized);
         if (!user.getPassword().equals(request.password())) {
-            throw new IllegalArgumentException("Invalid login or password");
+            throw unauthorized();
         }
-
-        if (user.getRole() != UserRole.APP_ADMINISTRATOR) {
-            SchoolMember schoolMember = schoolMemberRepository
-                    .findById(user.getId())
-                    .orElseThrow(() -> new EntityNotFoundException(SchoolMember.class, user.getId().toString()));
-
-            return new UserLoginResponse(
-                    user.getId(),
-                    user.getLogin(),
-                    user.getRole(),
-                    schoolMember.getSchool().getId(),
-                    user.isActive()
-            );
-        }
-
-
-        return new UserLoginResponse(
-                user.getId(),
-                user.getLogin(),
-                user.getRole(),
-                null,
-                user.isActive()
-        );
+        UUID schoolId = resolveSchoolId(user);
+        return mapper.mapEntityToLoginResponse(user, schoolId);
     }
 
-    @Transactional(readOnly = true)
-    public List<UserResponse> getUsers(Boolean active) {
-        List<User> users = active == null
-                ? userRepository.findAll()
-                : userRepository.findByIsActive(active);
-
-        return users.stream().map(this::mapToDto).toList();
+    public UserResponse getUserById(UUID userId) {
+        User user = getOrThrow(userRepository, User.class, userId);
+        return mapper.mapEntityToResponse(user);
     }
 
-    @Transactional(readOnly = true)
-    public UserResponse getUserById(UUID id) {
+    public List<UserResponse> getAllUsers() {
         return userRepository
-                .findById(id)
-                .map(this::mapToDto)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, id.toString()));
+                .findAll()
+                .stream()
+                .map(mapper::mapEntityToResponse)
+                .toList();
     }
 
-    public UserResponse updateUser(UUID id, UserUpdateRequest request) {
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, id.toString()));
+    @Transactional
+    public UserResponse updateUser(UUID userId, UserRequest request) {
+        User user = getOrThrow(userRepository, User.class, userId);
+        updateLogin(user, request.login());
+        updatePassword(user, request.password());
+        updateRole(user, request.role());
+        return mapper.mapEntityToResponse(user);
+    }
 
-        if (request.login() != null && !request.login().equals(user.getLogin())) {
-            if (userRepository.existsByLogin(request.login())) {
-                throw new ConflictException("Login is taken by another user");
-            }
-            user.setLogin(request.login());
+    @Transactional
+    public void activateUser(UUID userId) {
+        User user = getOrThrow(userRepository, User.class, userId);
+        user.setActive(true);
+    }
+
+    @Transactional
+    public void deactivateUser(UUID userId) {
+        User user = getOrThrow(userRepository, User.class, userId);
+        user.setActive(false);
+    }
+
+    @Transactional
+    public void deleteUser(UUID userId) {
+        User user = getOrThrow(userRepository, User.class, userId);
+        userRepository.delete(user);
+    }
+
+    private UnauthorizedException unauthorized() {
+        return new UnauthorizedException("Invalid credentials");
+    }
+
+    private UUID resolveSchoolId(User user) {
+        if (user.getRole() == UserRole.APP_ADMINISTRATOR) {
+            return null;
         }
+        SchoolMember schoolMember = getOrThrow(schoolMemberRepository, SchoolMember.class, user.getId());
+        return schoolMember.getSchool().getId();
+    }
 
-        if (request.password() != null) {
-            user.setPassword(request.password());
+    private void updateLogin(User user, String login) {
+        if (login == null || login.equals(user.getLogin())) {
+            return;
         }
-
-        if (request.role() != null) {
-            user.setRole(request.role());
+        boolean loginTaken = userRepository.existsByLogin(login);
+        if (loginTaken) {
+            throw new ConflictException("Login is taken by another user");
         }
-
-        userRepository.save(user);
-        return mapToDto(user);
+        user.setLogin(login);
     }
 
-    public void activate(UUID id) {
-        setActive(id, true);
-    }
-
-    public void deactivate(UUID id) {
-        setActive(id, false);
-    }
-
-    public void delete(UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException(User.class, id.toString());
+    private void updatePassword(User user, String password) {
+        if(password != null) {
+            user.setPassword(password);
         }
-        userRepository.deleteById(id);
     }
 
-    private void setActive(UUID id, boolean active) {
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, id.toString()));
-        user.setActive(active);
-    }
-
-    private UserResponse mapToDto(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getLogin(),
-                user.getRole(),
-                user.getCreatedAt(),
-                user.getModifiedAt(),
-                user.isActive()
-        );
+    private void updateRole(User user, UserRole role) {
+        if (role != null) {
+            user.setRole(role);
+        }
     }
 }

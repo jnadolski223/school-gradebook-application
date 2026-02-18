@@ -8,42 +8,31 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "schools")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class School {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
     private String street;
-
-    @Column(nullable = false)
     private String postalCode;
-
-    @Column(nullable = false)
     private String city;
-
     private String phoneNumber;
     private String email;
-
-    @Column(nullable = false)
     private String rspoNumber;
 
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
     private Instant modifiedAt;
 
-    @Column(nullable = false)
     @Builder.Default
     private boolean isActive = true;
 

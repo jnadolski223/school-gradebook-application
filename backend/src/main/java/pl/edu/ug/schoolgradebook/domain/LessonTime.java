@@ -3,28 +3,27 @@ package pl.edu.ug.schoolgradebook.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "school_classes")
+@Table(name = "lesson_hours")
 @Getter
 @Setter
-@ToString(exclude = {"school", "homeroomTeacher"})
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class SchoolClass {
+public class LessonTime {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(updatable = false)
     private School school;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
-    private SchoolMember homeroomTeacher;
-
-    private String name;
+    private LocalTime lessonStart;
+    private LocalTime lessonEnd;
 }

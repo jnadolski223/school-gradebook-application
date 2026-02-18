@@ -5,73 +5,60 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.ug.schoolgradebook.domain.School;
 import pl.edu.ug.schoolgradebook.domain.Subject;
-import pl.edu.ug.schoolgradebook.dto.subject.SubjectCreateRequest;
+import pl.edu.ug.schoolgradebook.dto.subject.SubjectRequest;
+import pl.edu.ug.schoolgradebook.dto.subject.SubjectRequestName;
 import pl.edu.ug.schoolgradebook.dto.subject.SubjectResponse;
-import pl.edu.ug.schoolgradebook.dto.subject.SubjectUpdateRequest;
 import pl.edu.ug.schoolgradebook.exception.ConflictException;
-import pl.edu.ug.schoolgradebook.exception.EntityNotFoundException;
 import pl.edu.ug.schoolgradebook.repository.SchoolRepository;
 import pl.edu.ug.schoolgradebook.repository.SubjectRepository;
+import pl.edu.ug.schoolgradebook.util.mapper.SubjectMapper;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class SubjectService {
-
+@Transactional(readOnly = true)
+public class SubjectService extends EntityService {
     private final SubjectRepository subjectRepository;
     private final SchoolRepository schoolRepository;
+    private final SubjectMapper mapper;
 
-    public SubjectResponse create(SubjectCreateRequest request) {
-        School school = schoolRepository
-                .findById(request.schoolId())
-                .orElseThrow(() -> new EntityNotFoundException(School.class, request.schoolId().toString()));
+    @Transactional
+    public SubjectResponse createSubject(SubjectRequest request) {
+        School school = getOrThrow(schoolRepository, School.class, request.schoolId());
 
         if (subjectRepository.existsBySchoolIdAndNameIgnoreCase(school.getId(), request.name())) {
-            throw new ConflictException("This subject already exists for this school");
+            throw new ConflictException("The subject already exists for this school");
         }
 
-        Subject subject = Subject.builder().school(school).name(request.name()).build();
-        subjectRepository.save(subject);
-        return mapToDto(subject);
+        Subject subject = mapper.mapRequestToEntity(request, school);
+        return mapper.mapEntityToResponse(subjectRepository.save(subject));
     }
 
-    @Transactional(readOnly = true)
-    public List<SubjectResponse> getAllBySchool(UUID schoolId) {
-        return subjectRepository.findBySchoolId(schoolId).stream().map(this::mapToDto).toList();
+    public SubjectResponse getSubjectById(UUID subjectId) {
+        Subject subject = getOrThrow(subjectRepository, Subject.class, subjectId);
+        return mapper.mapEntityToResponse(subject);
     }
 
-    @Transactional(readOnly = true)
-    public SubjectResponse getById(UUID id) {
-        Subject subject = subjectRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Subject.class, id.toString()));
-        return mapToDto(subject);
+    public List<SubjectResponse> getAllSubjectsBySchool(UUID schoolId) {
+        return subjectRepository
+                .findBySchoolId(schoolId)
+                .stream()
+                .map(mapper::mapEntityToResponse)
+                .toList();
     }
 
-    public SubjectResponse update(UUID id, SubjectUpdateRequest request) {
-        Subject subject = subjectRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Subject.class, id.toString()));
+    @Transactional
+    public SubjectResponse updateSubjectName(UUID subjectId, SubjectRequestName request) {
+        Subject subject = getOrThrow(subjectRepository, Subject.class, subjectId);
         subject.setName(request.name());
-        subjectRepository.save(subject);
-        return  mapToDto(subject);
+        return mapper.mapEntityToResponse(subject);
     }
 
-    public void delete(UUID id) {
-        if (!subjectRepository.existsById(id)) {
-            throw new EntityNotFoundException(Subject.class, id.toString());
-        }
-        subjectRepository.deleteById(id);
-    }
-
-    private SubjectResponse mapToDto(Subject subject) {
-        return new SubjectResponse(
-                subject.getId(),
-                subject.getSchool().getId(),
-                subject.getName()
-        );
+    @Transactional
+    public void deleteSubject(UUID subjectId) {
+        Subject subject = getOrThrow(subjectRepository, Subject.class, subjectId);
+        subjectRepository.delete(subject);
     }
 }

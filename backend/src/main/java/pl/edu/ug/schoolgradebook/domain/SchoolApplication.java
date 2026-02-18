@@ -9,49 +9,34 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "school_applications")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class SchoolApplication {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(nullable = false)
     private String senderFirstName;
-
-    @Column(nullable = false)
     private String senderLastName;
-
-    @Column(nullable = false)
     private String senderEmail;
-
-    @Column(nullable = false)
     private String schoolName;
-
-    @Column(nullable = false)
     private String schoolStreet;
-
-    @Column(nullable = false)
     private String schoolPostalCode;
-
-    @Column(nullable = false)
     private String schoolCity;
-
-    @Column(nullable = false)
     private String rspoNumber;
 
-    @Column(nullable = false)
+    @Lob
     private String description;
 
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private Instant createdAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     @Builder.Default
     private SchoolApplicationStatus status = SchoolApplicationStatus.PENDING;
 

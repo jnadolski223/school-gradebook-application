@@ -7,29 +7,24 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "school_members")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = {"user", "school"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class SchoolMember {
-
     @Id
-    @Column(name = "user_id")
     @Setter(AccessLevel.NONE)
     private UUID userId;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "school_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private School school;
 
-    @Column(nullable = false)
     private String firstName;
-
-    @Column(nullable = false)
     private String lastName;
 }

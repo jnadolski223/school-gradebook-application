@@ -6,27 +6,25 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "students")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = {"schoolMember", "parent", "schoolClass"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class Student {
-
     @Id
-    @Column(name = "user_id")
     @Setter(AccessLevel.NONE)
-    private UUID userId;
+    private UUID schoolMemberId;
 
     @MapsId
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
     private SchoolMember schoolMember;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "parent_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private SchoolMember parent;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private SchoolClass schoolClass;
+
 }
