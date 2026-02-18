@@ -58,9 +58,8 @@ public class StudentService extends EntityService {
             return mapper.mapEntityToResponse(studentRepository.save(student));
         } else {
             Student student = mapper.mapRequestToEntity(member, parent, null);
-            return mapper.mapEntityToResponseWithoutSchoolId(studentRepository.save(student));
+            return mapper.mapEntityToResponse(studentRepository.save(student));
         }
-
     }
 
     public StudentResponse getStudentById(UUID studentId) {
