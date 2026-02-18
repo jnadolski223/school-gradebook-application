@@ -10,6 +10,7 @@ import {
   updateSchoolMember,
   deleteSchoolMember,
   updateUser,
+  deleteUser,
   getStudentById,
   updateStudent,
   deleteStudent,
@@ -254,6 +255,8 @@ export default function MemberDetailsPage({
     try {
       if (isStudent) {
         await deleteStudent(id);
+        await deleteSchoolMember(id);
+        await deleteUser(user?.id ?? id);
       } else {
         await deleteSchoolMember(id);
       }

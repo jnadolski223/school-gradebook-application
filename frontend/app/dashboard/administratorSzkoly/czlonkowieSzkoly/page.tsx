@@ -9,6 +9,7 @@ import {
   getUserById,
   getAllStudents,
   deleteStudent,
+  deleteUser,
   getSchoolClassesBySchoolId,
   SchoolClass,
 } from "@/lib/api";
@@ -104,6 +105,8 @@ export default function SchoolMembersPage() {
     try {
       if (isStudent) {
         await deleteStudent(userId);
+        await deleteSchoolMember(userId);
+        await deleteUser(userId);
       } else {
         await deleteSchoolMember(userId);
       }
