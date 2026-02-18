@@ -950,3 +950,131 @@ export async function deleteLesson(id: string) {
     throw new Error("Failed to delete lesson");
   }
 }
+
+// --- Grades API ---
+export type GradeType =
+  | "REGULAR_SEMESTER_1"
+  | "FINAL_SEMESTER_1"
+  | "REGULAR_SEMESTER_2"
+  | "FINAL_SEMESTER_2"
+  | "FINAL";
+
+export type GradeValue =
+  | "ONE"
+  | "ONE_PLUS"
+  | "TWO_MINUS"
+  | "TWO"
+  | "TWO_PLUS"
+  | "THREE_MINUS"
+  | "THREE"
+  | "THREE_PLUS"
+  | "FOUR_MINUS"
+  | "FOUR"
+  | "FOUR_PLUS"
+  | "FIVE_MINUS"
+  | "FIVE"
+  | "FIVE_PLUS"
+  | "SIX_MINUS"
+  | "SIX"
+  | "MINUS"
+  | "PLUS"
+  | "NO_HOMEWORK"
+  | "NOT_PREPARED"
+  | "NOT_CLASSIFIED";
+
+export interface GradeRequest {
+  studentId: string;
+  teacherId: string;
+  subjectId: string;
+  gradeValue: GradeValue;
+  gradeType: GradeType;
+  weight: number;
+  countToAverage: boolean;
+  description?: string | null;
+}
+
+export interface GradeResponse {
+  id: string;
+  studentId: string;
+  teacherId: string;
+  subjectId: string;
+  gradeValue: GradeValue;
+  gradeType: GradeType;
+  weight: number;
+  countToAverage: boolean;
+  createdAt: string;
+  modifiedAt: string;
+  description: string | null;
+}
+
+// Tworzy nową ocenę
+export async function createGrade(data: GradeRequest) {
+  const response = await fetch(`${API_BASE_URL}/grades`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create grade");
+  }
+
+  return (await response.json()) as ApiResponse<GradeResponse>;
+}
+
+// Pobiera ocenę po ID
+export async function getGradeById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/grades/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch grade");
+  }
+
+  return (await response.json()) as ApiResponse<GradeResponse>;
+}
+
+// Pobiera wszystkie oceny (opcjonalnie dla ucznia)
+export async function getAllGrades(studentId?: string) {
+  const url = new URL(`${API_BASE_URL}/grades`);
+  if (studentId) {
+    url.searchParams.append("studentId", studentId);
+  }
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch grades");
+  }
+
+  return (await response.json()) as ApiResponse<GradeResponse[]>;
+}
+
+// Aktualizuje ocenę
+export async function updateGrade(id: string, data: GradeRequest) {
+  const response = await fetch(`${API_BASE_URL}/grades/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update grade");
+  }
+
+  return (await response.json()) as ApiResponse<GradeResponse>;
+}
+
+// Usuwa ocenę
+export async function deleteGrade(id: string) {
+  const response = await fetch(`${API_BASE_URL}/grades/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 204) {
+    throw new Error("Failed to delete grade");
+  }
+}
