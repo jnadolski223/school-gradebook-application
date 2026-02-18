@@ -28,7 +28,9 @@ public class LessonTimeService extends EntityService {
     @Transactional
     public LessonTimeResponse createLessonTime(LessonTimeRequest request) {
         School school = getOrThrow(schoolRepository, School.class, request.schoolId());
-        validateStartAndEndTime(school, request.lessonStart(), request.lessonEnd());
+
+        validateLessonTime(school, request.lessonStart(), request.lessonEnd());
+
         LessonTime lessonTime = mapper.mapRequestToEntity(request, school);
         return mapper.mapEntityToResponse(lessonTimeRepository.save(lessonTime));
     }
@@ -49,6 +51,9 @@ public class LessonTimeService extends EntityService {
     @Transactional
     public LessonTimeResponse updateLessonTime(UUID lessonTimeId, LessonTimeUpdateRequest request) {
         LessonTime lessonTime = getOrThrow(lessonTimeRepository, LessonTime.class, lessonTimeId);
+
+        validateLessonTimeForUpdate(lessonTime.getSchool(), lessonTimeId, request.lessonStart(), request.lessonEnd());
+
         lessonTime.setLessonStart(request.lessonStart());
         lessonTime.setLessonEnd(request.lessonEnd());
         return mapper.mapEntityToResponse(lessonTime);
@@ -60,17 +65,22 @@ public class LessonTimeService extends EntityService {
         lessonTimeRepository.delete(lessonTime);
     }
 
-    private void validateStartAndEndTime(School school, LocalTime lessonStart, LocalTime lessonEnd) {
-        if (lessonStart.isAfter(lessonEnd)) {
-            throw new ConflictException("The start time cannot be later than the end time");
+    private void validateLessonTime(School school, LocalTime start, LocalTime end) {
+        if (!start.isBefore(end)) {
+            throw new ConflictException("Lesson start must be before lesson end");
+        }
+        if (lessonTimeRepository.existsOverlappingLessonTime(school, start, end)) {
+            throw new ConflictException("Lesson time overlaps with existing lesson");
+        }
+    }
+
+    private void validateLessonTimeForUpdate(School school, UUID lessonTimeId, LocalTime start, LocalTime end) {
+        if (!start.isBefore(end)) {
+            throw new ConflictException("Lesson start must be before lesson end");
         }
 
-        if (lessonTimeRepository.existsBySchoolAndLessonStart(school, lessonStart)) {
-            throw new ConflictException("The start time already exists for this school");
-        }
-
-        if (lessonTimeRepository.existsBySchoolAndLessonEnd(school, lessonEnd)) {
-            throw new ConflictException("The end time already exists for this school");
+        if (lessonTimeRepository.existsOverlappingLessonTimeForUpdate(school, lessonTimeId, start, end)) {
+            throw new ConflictException("Lesson time overlaps with existing lesson");
         }
     }
 }
