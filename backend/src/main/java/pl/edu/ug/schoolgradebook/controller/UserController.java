@@ -1,7 +1,6 @@
 package pl.edu.ug.schoolgradebook.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.ug.schoolgradebook.api.ApiPaths;
@@ -12,6 +11,7 @@ import pl.edu.ug.schoolgradebook.dto.user.UserRequest;
 import pl.edu.ug.schoolgradebook.dto.user.UserResponse;
 import pl.edu.ug.schoolgradebook.service.UserService;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,8 +25,9 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(@RequestBody UserRequest request) {
         UserResponse user = service.registerUser(request);
+        URI location = URI.create(ApiPaths.USERS + "/" + user.id());
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .created(location)
                 .body(ApiResponse.created("User registered successfully", user));
     }
 
