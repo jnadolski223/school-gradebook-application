@@ -200,6 +200,76 @@ export async function updateSchool(id: string, data: UpdateSchoolRequest) {
   return (await response.json()) as ApiResponse<School>;
 }
 
+// Attendance types
+export type AttendanceStatus =
+  | "PRESENT"
+  | "ABSENT"
+  | "EXCUSED"
+  | "LATE"
+  | "JUSTIFIED";
+
+export interface AttendanceRequest {
+  teacherId: string;
+  studentId: string;
+  lessonTimeId: string;
+  lessonDate: string; // YYYY-MM-DD
+  attendanceStatus: AttendanceStatus;
+}
+
+export interface AttendanceResponse {
+  id: string;
+  teacherId: string;
+  studentId: string;
+  lessonTimeId: string;
+  lessonDate: string;
+  attendanceStatus: AttendanceStatus;
+  createdAt: string;
+  modifiedAt: string;
+}
+
+export async function createAttendance(data: AttendanceRequest) {
+  const response = await fetch(`${API_BASE_URL}/attendances`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create attendance record");
+  }
+
+  return (await response.json()) as ApiResponse<AttendanceResponse>;
+}
+
+export async function getAttendancesByStudentId(studentId: string) {
+  const response = await fetch(
+    `${API_BASE_URL}/attendances?studentId=${studentId}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch attendance records");
+  }
+
+  return (await response.json()) as ApiResponse<AttendanceResponse[]>;
+}
+
+export async function updateAttendance(
+  attendanceId: string,
+  data: { teacherId: string; attendanceStatus: AttendanceStatus },
+) {
+  const response = await fetch(`${API_BASE_URL}/attendances/${attendanceId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update attendance record");
+  }
+
+  return (await response.json()) as ApiResponse<AttendanceResponse>;
+}
+
 // User types
 export type UserRole =
   | "STUDENT"
@@ -1077,4 +1147,35 @@ export async function deleteGrade(id: string) {
   if (response.status !== 204) {
     throw new Error("Failed to delete grade");
   }
+}
+
+// --- Attendance API ---
+export interface AttendanceResponse {
+  id: string;
+  teacherId: string;
+  studentId: string;
+  lessonTimeId: string;
+  lessonDate: string;
+  attendanceStatus: AttendanceStatus;
+  createdAt: string;
+  modifiedAt: string;
+}
+
+export interface LessonTimeResponse {
+  id: string;
+  schoolId: string;
+  lessonStart: string;
+  lessonEnd: string;
+  lessonNumber: number;
+}
+
+// Pobiera pojedynczą obecność po ID
+export async function getAttendanceById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/attendances/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch attendance");
+  }
+
+  return (await response.json()) as ApiResponse<AttendanceResponse>;
 }

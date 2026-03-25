@@ -16,6 +16,7 @@ export default function UczenLayout({
     { label: "Profil", href: "/dashboard/uczen/profil" },
     { label: "Oceny", href: "/dashboard/uczen/oceny" },
     { label: "Plan zajec", href: "/dashboard/uczen/plan-zajec" },
+    { label: "Frekwencja", href: "/dashboard/uczen/frekwencja" },
     {
       label: "Informacje o szkole",
       href: "/dashboard/uczen/informacje-o-szkole",
