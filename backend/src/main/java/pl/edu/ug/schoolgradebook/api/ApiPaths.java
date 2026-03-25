@@ -14,4 +14,5 @@ public class ApiPaths {
     public static final String LESSON_TIMES = API_V1 + "/lesson-times";
     public static final String LESSONS = API_V1 + "/lessons";
     public static final String GRADES = API_V1 + "/grades";
+    public static final String ATTENDANCES = API_V1 + "/attendances";
 }
