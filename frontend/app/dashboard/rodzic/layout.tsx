@@ -16,6 +16,7 @@ export default function RodzicLayout({
     { label: "Profil", href: "/dashboard/rodzic/profil" },
     { label: "Oceny", href: "/dashboard/rodzic/oceny" },
     { label: "Plan zajec", href: "/dashboard/rodzic/plan-zajec" },
+    { label: "Frekwencja", href: "/dashboard/rodzic/frekwencja" },
     {
       label: "Informacje o szkole",
       href: "/dashboard/rodzic/informacje-o-szkole",

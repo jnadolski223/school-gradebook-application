@@ -16,6 +16,7 @@ export default function NauczycielLayout({
     { label: "Profil", href: "/dashboard/nauczyciel/profil" },
     { label: "Oceny", href: "/dashboard/nauczyciel/oceny" },
     { label: "Plan zajec", href: "/dashboard/nauczyciel/plan-zajec" },
+    { label: "Frekwencja", href: "/dashboard/nauczyciel/frekwencja" },
     {
       label: "Informacje o szkole",
       href: "/dashboard/nauczyciel/informacje-o-szkole",
