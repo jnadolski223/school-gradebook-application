@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import {
   getAllStudents,
@@ -63,20 +62,6 @@ export default function RodzicFrekwencjaPage() {
       }
       grid[attendance.lessonDate][attendance.lessonTimeId] =
         attendanceStatusLabels[attendance.attendanceStatus] || "";
-    });
-
-    return grid;
-  }, [attendances]);
-
-  // Group attendance IDs by date and lesson time
-  const attendanceIdGrid = useMemo(() => {
-    const grid: Record<string, Record<string, string>> = {};
-
-    attendances.forEach((attendance) => {
-      if (!grid[attendance.lessonDate]) {
-        grid[attendance.lessonDate] = {};
-      }
-      grid[attendance.lessonDate][attendance.lessonTimeId] = attendance.id;
     });
 
     return grid;
@@ -367,56 +352,27 @@ export default function RodzicFrekwencjaPage() {
                   </div>
                   {lessonTimes
                     .sort((a, b) => a.lessonStart.localeCompare(b.lessonStart))
-                    .map((lessonTime) => {
-                      const attendanceId = attendanceIdGrid[date]?.[lessonTime.id];
-                      const status = attendanceGrid[date]?.[lessonTime.id] || "";
-
-                      if (attendanceId) {
-                        return (
-                          <Link
-                            key={lessonTime.id}
-                            href={`/dashboard/rodzic/frekwencja/${attendanceId}`}
-                            style={{
-                              width: "100%",
-                              height: "40px",
-                              borderRadius: "4px",
-                              ...getAttendanceStyle(status),
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              textAlign: "center",
-                              fontSize: "0.8rem",
-                              fontWeight: "600",
-                              textDecoration: "none",
-                              color: "inherit",
-                            }}
-                          >
-                            {status}
-                          </Link>
-                        );
-                      } else {
-                        return (
-                          <div
-                            key={lessonTime.id}
-                            style={{
-                              width: "100%",
-                              height: "40px",
-                              borderRadius: "4px",
-                              backgroundColor: "#f3f4f6",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              textAlign: "center",
-                              fontSize: "0.8rem",
-                              fontWeight: "600",
-                              color: "#9ca3af",
-                            }}
-                          >
-                            -
-                          </div>
-                        );
-                      }
-                    })}
+                    .map((lessonTime) => (
+                      <div
+                        key={lessonTime.id}
+                        style={{
+                          width: "100%",
+                          height: "40px",
+                          borderRadius: "4px",
+                          ...getAttendanceStyle(
+                            attendanceGrid[date]?.[lessonTime.id] || "",
+                          ),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          fontSize: "0.8rem",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {attendanceGrid[date]?.[lessonTime.id] || ""}
+                      </div>
+                    ))}
                 </div>
               ))}
             </div>
