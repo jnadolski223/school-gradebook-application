@@ -70,6 +70,7 @@ public class SchoolClassServiceTests {
                 .user(User.builder().role(UserRole.TEACHER).build())
                 .build();
 
+        id = UUID.randomUUID();
         request = new SchoolClassRequest(schoolId, schoolMemberId, "1A");
         schoolClass = SchoolClass.builder()
                 .id(id)
