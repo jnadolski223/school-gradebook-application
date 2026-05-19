@@ -1,8 +1,4 @@
-# Projekt zespołowy
-Temat projektu: Dziennik elektroniczny dla szkół
-Członkowie grupy:
-- Jakub Nadolski
-- Igor Gula
+# Dziennik elektroniczny
 
 ## Opis projektu
 Celem projektu jest stworzenie dziennika elektronicznego dla szkół podstawowych i średnich na wzór aplikacji tj. Librus.
@@ -11,10 +7,9 @@ Celem projektu jest stworzenie dziennika elektronicznego dla szkół podstawowyc
 - Frontend: TypeScript, React, Next.js
 - Backend: Java, Spring Boot
 - Baza danych: PostgreSQL
-- Konteneryzacja aplikacji: Docker
 
 ## Role użytkowników
-W aplikacji będzie dostępnie kilka ról użytkowników:
+W aplikacji dostępne są następujące role użytkowników:
 - Administrator aplikacji
 - Administrator szkoły
 - Nauczyciel
@@ -22,61 +17,55 @@ W aplikacji będzie dostępnie kilka ról użytkowników:
 - Uczeń
 - Rodzic
 
-Schemat dziedziczenia funkcjonalności przypisanych do ról przedstawiono na diagramie ([link](./diagrams/user-roles.png)).
-
 ## Wymagania funkcjonalne aplikacji
-Wymagania funkcjonalne zostały podzielone według ról użytkowników, które będą dostępne w systemie dziennika elektronicznego. Role **Użytkownik** i **Członek szkoły** są abstrakcyjnymi rolami, które nie są dostępne dla użytkowników aplikacji. Podział funkcjonalności został też przedstawiony na diagramie przypadków użycia ([link](./diagrams/use-case-diagram.png))
+Wymagania funkcjonalne zostały podzielone według ról użytkowników, które będą dostępne w systemie dziennika elektronicznego.
+Role **Użytkownik** i **Członek szkoły** są abstrakcyjnymi rolami, które nie są dostępne dla użytkowników aplikacji.
 
 ### Niezalogowany użytkownik
-- Pisanie wniosków o rejestrację szkoły w systemie
-- Logowanie się na konto
+- [x] Pisanie wniosków o rejestrację szkoły w systemie
+- [x] Logowanie się na konto
 
 ### Użytkownik
-- Zarządzanie danymi konta
+- [x] Zarządzanie danymi konta
 
 ### Administrator aplikacji
 - Funkcjonalności dla roli ***Użytkownik***
-- Obsługa wniosków o rejestrację szkoły w systemie
-- Zarządzanie szkołami w systemie
+- [x] Obsługa wniosków o rejestrację szkoły w systemie
+- [x] Zarządzanie szkołami w systemie
 
 ### Administrator szkoły
 - Funkcjonalności dla roli ***Użytkownik*** 
-- Zarządzanie danymi szkoły
-- Zarządzanie członkami szkoły
-- Zarządzanie klasami w szkole
-- Zarządzanie planami zajęć klas i nauczycieli
+- [x] Zarządzanie danymi szkoły
+- [x] Zarządzanie członkami szkoły
+- [x] Zarządzanie klasami w szkole
+- [x] Zarządzanie planami zajęć klas i nauczycieli
 
 ### Członek szkoły
 - Funkcjonalności dla roli ***Użytkownik***
-- Przeglądanie planu zajęć
-- Przeglądanie kalendarza
-- Przeglądanie wiadomości
-- Pisanie wiadomości
+- [x] Przeglądanie planu zajęć
+- [ ] Przeglądanie kalendarza
+- [ ] Przeglądanie wiadomości
+- [ ] Pisanie wiadomości
 
 ### Uczeń
 - Funkcjonalności dla roli ***Członek szkoły****
-- Przeglądanie ocen
-- Przeglądanie frekwencji
-- Przeglądanie uwag
+- [x] Przeglądanie ocen
+- [x] Przeglądanie frekwencji
+- [ ] Przeglądanie uwag
 
 ### Rodzic
 - Funkcjonalności dla roli ***Uczeń***
-- Dostęp do listy uczniów, których jest się rodzicem
+- [x] Dostęp do listy uczniów, których jest się rodzicem
 
 ### Nauczyciel
 - Funkcjonalności dla roli ***Członek szkoły***
-- Przeglądanie i wpisywanie ocen (tylko dla uczniów uczonych klas)
-- Przeglądanie i wpisywanie frekwencji (tylko dla uczniów uczonych klas)
-- Przeglądanie i wpisywanie uwag (tylko dla uczniów uczonych klas)
-- Wpisywanie wydarzeń do kalendarza
+- [x] Przeglądanie i wpisywanie ocen
+- [x] Przeglądanie i wpisywanie frekwencji
+- [ ] Przeglądanie i wpisywanie uwag
+- [ ] Wpisywanie wydarzeń do kalendarza
 
 ### Wychowawca
 - Funkcjonalności dla roli ***Nauczyciel***
-- Przeglądanie danych uczniów klasy
-- Przeglądanie planu zajęć klasy
-- Modyfikacja frekwencji uczniów klasy
-
-## Baza danych
-- Diagram ERD bazy danych ([link](./diagrams/erd-diagram.pdf))
-- Kod diagramu ERD bazy danych w języku DBML ([link](./diagrams/erd-diagram-source.dbml))
-
+- [ ] Przeglądanie danych uczniów klasy
+- [ ] Przeglądanie planu zajęć klasy
+- [ ] Modyfikacja frekwencji uczniów klasy
